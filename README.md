@@ -1,3 +1,3 @@
 # Dine and Jam
 
-Added a tiny change to trigger redeploy
+redeploy after env var check
