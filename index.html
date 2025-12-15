@@ -1,47 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
-  <style>
-  /* Container for all cards */
-  #performers {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 20px;
-  }
-
-  /* Individual performer cards */
-  .card {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px;
-    width: 200px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  /* Hover effect */
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
-  }
-
-  .card h2 {
-    margin: 0 0 10px;
-    font-size: 1.2em;
-  }
-
-  .card p {
-    margin: 5px 0;
-    font-size: 0.95em;
-    color: #555;
-  }
-</style>
-
   <meta charset="UTF-8" />
   <title>Dine and Jam</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -49,33 +11,100 @@
       padding: 40px;
     }
 
+    /* Container for all cards */
+    #performers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    /* Individual performer cards */
     .card {
-      background: white;
-      max-width: 300px;
-      padding: 20px;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 15px;
+      width: 220px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .name {
-      font-size: 1.3rem;
-      font-weight: bold;
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
     }
 
-    .genre {
-      color: #666;
-      margin-bottom: 10px;
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1.2em;
+    }
+
+    .card p {
+      margin: 5px 0;
+      font-size: 0.95em;
+      color: #555;
     }
   </style>
 </head>
+
 <body>
 
-  <div class="card">
-    <div class="name">Stage Name</div>
-    <div class="genre">Genre: Acoustic / Pop</div>
-    <p>Short bio goes here.</p>
-  </div>
-<div id="performers"></div>
-<script src="script.js"></script>
+  <h1>Our Performers</h1>
+
+  <!-- 👇 THIS IS WHERE CARDS WILL APPEAR -->
+  <div id="performers"></div>
+
+  <!-- 👇 UPDATED SCRIPT TO READ RAW NOTION DATA -->
+  <script>
+    fetch("https://dineandjam-notion-api.vercel.app/api/performers")
+      .then(res => res.json())
+      .then(pages => {
+        const container = document.getElementById("performers");
+
+        if (pages.length === 0) {
+          container.innerHTML = "<p>No performers yet.</p>";
+          return;
+        }
+
+        pages.forEach(page => {
+          const props = page.properties;
+
+          const stageName =
+            props["Stage Name"]?.title?.[0]?.plain_text || "Unnamed Performer";
+
+          const city =
+            props["City"]?.rich_text?.[0]?.plain_text || "";
+
+          const genre =
+            props["Genre"]?.rich_text?.[0]?.plain_text || "";
+
+          const bio =
+            props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
+
+          const video =
+            props["Sample Video"]?.url || "";
+
+          const card = document.createElement("div");
+          card.className = "card";
+
+          card.innerHTML = `
+            <h2>${stageName}</h2>
+            <p><strong>City:</strong> ${city}</p>
+            <p><strong>Genre:</strong> ${genre}</p>
+            <p>${bio}</p>
+            ${video ? `<a href="${video}" target="_blank">Watch Video</a>` : ""}
+          `;
+
+          container.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error("API error:", err);
+      });
+  </script>
+
 </body>
 </html>
+
+
