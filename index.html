@@ -55,7 +55,7 @@
   <!-- 👇 THIS IS WHERE CARDS WILL APPEAR -->
   <div id="performers"></div>
 
-  <!-- 👇 UPDATED SCRIPT TO READ RAW NOTION DATA -->
+  <!-- 👇 SCRIPT WITH QUICK TEST -->
   <script>
     fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       .then(res => res.json())
@@ -68,6 +68,9 @@
         }
 
         pages.forEach(page => {
+          // <<< QUICK TEST: logs each performer's properties
+          console.log(page.properties);
+
           const props = page.properties;
 
           const stageName =
@@ -106,5 +109,6 @@
 
 </body>
 </html>
+
 
 
