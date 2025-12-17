@@ -5,10 +5,15 @@ const notion = new Client({
 });
 
 export default async function handler(req, res) {
-  // ✅ CORS HEADERS (THIS FIXES YOUR ERROR)
+  // ✅ CORS HEADERS — THIS IS THE FIX
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle preflight
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
 
   try {
     const response = await notion.databases.query({
@@ -21,3 +26,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
