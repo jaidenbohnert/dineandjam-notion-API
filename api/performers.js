@@ -5,6 +5,11 @@ const notion = new Client({
 });
 
 export default async function handler(req, res) {
+  // ✅ CORS HEADERS (THIS FIXES YOUR ERROR)
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
   try {
     const response = await notion.databases.query({
       database_id: "2c4abfbb44b980b3a34ad366311d8388",
