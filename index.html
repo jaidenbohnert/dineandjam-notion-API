@@ -59,6 +59,7 @@
     .card .socials {
       margin-bottom: 10px;
       font-size: 0.9em;
+      text-align: center;
     }
 
     .card .socials a {
@@ -101,6 +102,7 @@
         pages.forEach(page => {
           const props = page.properties;
 
+          // Get performer fields
           const name = props["Name"]?.title?.[0]?.plain_text || "Unnamed Performer";
           const socials = props["Socials"]?.rich_text?.[0]?.plain_text || "";
           const city = props["City"]?.rich_text?.[0]?.plain_text || "";
@@ -109,8 +111,10 @@
           const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
           const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
 
+          // Profile picture
           const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || "";
 
+          // Build card
           const card = document.createElement("div");
           card.className = "card";
 
