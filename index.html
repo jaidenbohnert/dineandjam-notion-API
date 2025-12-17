@@ -15,7 +15,6 @@
       text-align: center;
     }
 
-    /* Container for all cards */
     #performers {
       display: flex;
       flex-wrap: wrap;
@@ -24,13 +23,12 @@
       margin-top: 20px;
     }
 
-    /* Individual performer cards */
     .card {
       background-color: #ffffff;
       border: 1px solid #ddd;
       border-radius: 10px;
       padding: 20px;
-      width: 300px;
+      width: 320px;
       box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
       transition: transform 0.2s, box-shadow 0.2s;
       display: flex;
@@ -78,7 +76,7 @@
 
     .card .bio {
       margin-top: 10px;
-      white-space: pre-wrap; /* preserve spacing */
+      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -95,7 +93,7 @@
       .then(pages => {
         const container = document.getElementById("performers");
 
-        if (pages.length === 0) {
+        if (!pages || pages.length === 0) {
           container.innerHTML = "<p>No performers yet.</p>";
           return;
         }
@@ -136,6 +134,7 @@
 
 </body>
 </html>
+
 
 
 
