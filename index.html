@@ -35,6 +35,12 @@
       box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
     }
 
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
     .card h2 {
       margin: 0 0 10px;
       font-size: 1.2em;
@@ -55,7 +61,7 @@
   <!-- 👇 THIS IS WHERE CARDS WILL APPEAR -->
   <div id="performers"></div>
 
-  <!-- 👇 SCRIPT WITH QUICK TEST -->
+  <!-- 👇 SCRIPT WITH PROFILE PICTURES -->
   <script>
     fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       .then(res => res.json())
@@ -68,8 +74,7 @@
         }
 
         pages.forEach(page => {
-          // <<< QUICK TEST: logs each performer's properties
-          console.log(page.properties);
+          console.log(page.properties); // quick test
 
           const props = page.properties;
 
@@ -85,6 +90,9 @@
           const bio =
             props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
 
+          // Profile picture URL (first file if exists)
+          const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || "";
+
           const video =
             props["Sample Video"]?.url || "";
 
@@ -92,6 +100,7 @@
           card.className = "card";
 
           card.innerHTML = `
+            ${profilePic ? `<img src="${profilePic}" alt="${stageName}">` : ""}
             <h2>${stageName}</h2>
             <p><strong>City:</strong> ${city}</p>
             <p><strong>Genre:</strong> ${genre}</p>
