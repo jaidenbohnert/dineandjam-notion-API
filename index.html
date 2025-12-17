@@ -11,11 +11,16 @@
       padding: 40px;
     }
 
+    h1 {
+      text-align: center;
+    }
+
     /* Container for all cards */
     #performers {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
+      justify-content: center;
       margin-top: 20px;
     }
 
@@ -24,32 +29,56 @@
       background-color: #ffffff;
       border: 1px solid #ddd;
       border-radius: 10px;
-      padding: 15px;
-      width: 220px;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 300px;
+      box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
       transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 4px 4px 16px rgba(0,0,0,0.2);
     }
 
     .card img {
       width: 100%;
+      height: 200px;
+      object-fit: cover;
       border-radius: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     .card h2 {
       margin: 0 0 10px;
-      font-size: 1.2em;
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .card .socials {
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+
+    .card .socials a {
+      text-decoration: none;
+      color: #007bff;
+      margin: 0 5px;
     }
 
     .card p {
-      margin: 5px 0;
+      margin: 3px 0;
       font-size: 0.95em;
       color: #555;
+      text-align: center;
+    }
+
+    .card .bio {
+      margin-top: 10px;
+      white-space: pre-wrap; /* preserve spacing */
     }
   </style>
 </head>
@@ -58,10 +87,8 @@
 
   <h1>Our Performers</h1>
 
-  <!-- 👇 THIS IS WHERE CARDS WILL APPEAR -->
   <div id="performers"></div>
 
-  <!-- 👇 SCRIPT WITH PROFILE PICTURES -->
   <script>
     fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       .then(res => res.json())
@@ -74,38 +101,29 @@
         }
 
         pages.forEach(page => {
-          console.log(page.properties); // quick test
-
           const props = page.properties;
 
-          const stageName =
-            props["Stage Name"]?.title?.[0]?.plain_text || "Unnamed Performer";
+          const name = props["Name"]?.title?.[0]?.plain_text || "Unnamed Performer";
+          const socials = props["Socials"]?.rich_text?.[0]?.plain_text || "";
+          const city = props["City"]?.rich_text?.[0]?.plain_text || "";
+          const state = props["State"]?.rich_text?.[0]?.plain_text || "";
+          const phone = props["Phone Number"]?.rich_text?.[0]?.plain_text || "";
+          const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
+          const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
 
-          const city =
-            props["City"]?.rich_text?.[0]?.plain_text || "";
-
-          const genre =
-            props["Genre"]?.rich_text?.[0]?.plain_text || "";
-
-          const bio =
-            props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
-
-          // Profile picture URL (first file if exists)
           const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || "";
-
-          const video =
-            props["Sample Video"]?.url || "";
 
           const card = document.createElement("div");
           card.className = "card";
 
           card.innerHTML = `
-            ${profilePic ? `<img src="${profilePic}" alt="${stageName}">` : ""}
-            <h2>${stageName}</h2>
-            <p><strong>City:</strong> ${city}</p>
-            <p><strong>Genre:</strong> ${genre}</p>
-            <p>${bio}</p>
-            ${video ? `<a href="${video}" target="_blank">Watch Video</a>` : ""}
+            ${profilePic ? `<img src="${profilePic}" alt="${name}">` : ""}
+            <h2>${name}</h2>
+            ${socials ? `<div class="socials">${socials}</div>` : ""}
+            ${city || state ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
+            ${phone ? `<p>${phone}</p>` : ""}
+            ${genre ? `<p><strong>Genre:</strong> ${genre}</p>` : ""}
+            ${bio ? `<p class="bio">  ${bio}</p>` : ""}
           `;
 
           container.appendChild(card);
@@ -118,6 +136,7 @@
 
 </body>
 </html>
+
 
 
 
