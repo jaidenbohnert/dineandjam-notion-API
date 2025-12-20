@@ -6,55 +6,63 @@
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 40px;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+      min-height: 100vh;
+      padding: 40px 20px;
+      margin: 0;
     }
 
     h1 {
       text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 40px;
+      color: #333;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
 
     #performers {
       display: flex;
       flex-wrap: wrap;
-      gap: 25px;
+      gap: 30px;
       justify-content: center;
-      margin-top: 30px;
     }
 
     .card {
       background: #ffffff;
-      border-radius: 14px;
-      padding: 22px;
+      border-radius: 20px;
+      padding: 24px;
       width: 360px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transform: translateY(-8px);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.2);
     }
 
     .card img {
       width: 100%;
-      height: 220px;
+      height: 240px;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 15px;
       margin-top: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .card h2 {
       margin: 0 0 6px;
-      font-size: 1.6em;
+      font-size: 1.7em;
       font-weight: bold;
       text-align: center;
-      color: #000;
+      background: linear-gradient(90deg, #ff8a00, #e52e71);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .missing-name {
@@ -65,23 +73,39 @@
     }
 
     .socials {
-      margin-bottom: 10px;
-      font-size: 0.9em;
-      color: #007bff;
-      text-align: center;
-      word-break: break-word;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .socials a {
+      padding: 6px 12px;
+      background: #007bff;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.85em;
+      transition: background 0.2s;
+    }
+
+    .socials a:hover {
+      background: #0056b3;
     }
 
     .card p {
-      margin: 4px 0;
+      margin: 6px 0;
       font-size: 0.95em;
-      color: #333;
+      color: #555;
       text-align: center;
     }
 
     .bio {
       margin-top: 14px;
       white-space: pre-wrap;
+      font-style: italic;
+      color: #333;
     }
   </style>
 </head>
@@ -107,7 +131,6 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
     pages.forEach(page => {
       const props = page.properties || {};
 
-      // 🔐 LOCKED-DOWN NAME LOGIC
       const titleProp = Object.values(props).find(p => p.type === "title");
       const realName = titleProp?.title?.[0]?.plain_text || "";
       const stageName = props["Stage name(optional)"]?.rich_text?.[0]?.plain_text || "";
@@ -115,24 +138,21 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       let displayName = "";
       let missingName = false;
 
-      if (realName) {
-        displayName = realName;
-      } else if (stageName) {
-        displayName = stageName;
-      } else {
+      if (realName) displayName = realName;
+      else if (stageName) displayName = stageName;
+      else {
         displayName = "(Name Missing in Notion)";
         missingName = true;
       }
 
-      // Safely read other fields
-      const socials = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
+      const socialsRaw = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
+      const socials = socialsRaw.split(",").map(s => s.trim()); // multiple socials as links
       const city = props["City"]?.rich_text?.[0]?.plain_text || "";
       const state = props["State"]?.rich_text?.[0]?.plain_text || "";
       const phone = props["Phone #"]?.rich_text?.[0]?.plain_text || "";
       const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
       const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
 
-      // ✅ FIXED PROFILE PICTURE LOGIC (handles file & external URL)
       const profilePic =
         props["Profile Picture"]?.files?.[0]?.file?.url ||
         props["Profile Picture"]?.files?.[0]?.external?.url ||
@@ -145,7 +165,7 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
         <h2>${displayName}</h2>
         ${missingName ? `<div class="missing-name">Missing Name in Notion DB</div>` : ""}
         ${profilePic ? `<img src="${profilePic}" alt="${displayName}">` : ""}
-        ${socials ? `<div class="socials">${socials}</div>` : ""}
+        ${socials.length ? `<div class="socials">${socials.map(s => `<a href="${s}" target="_blank">${s}</a>`).join('')}</div>` : ""}
         ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
         ${phone ? `<p>${phone}</p>` : ""}
         ${genre ? `<p><strong>Genre:</strong> ${genre}</p>` : ""}
