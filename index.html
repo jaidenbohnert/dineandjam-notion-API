@@ -131,7 +131,12 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       const phone = props["Phone #"]?.rich_text?.[0]?.plain_text || "";
       const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
       const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
-      const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || "";
+
+      // ✅ FIXED PROFILE PICTURE LOGIC (handles file & external URL)
+      const profilePic =
+        props["Profile Picture"]?.files?.[0]?.file?.url ||
+        props["Profile Picture"]?.files?.[0]?.external?.url ||
+        "";
 
       const card = document.createElement("div");
       card.className = "card";
