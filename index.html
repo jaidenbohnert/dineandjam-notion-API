@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dine and Jam</title>
+  <title>Dine and Jam – Performers</title>
 
   <style>
     body {
@@ -25,14 +25,19 @@
 
     .card {
       background: #ffffff;
-      border: 2px solid #222;
       border-radius: 14px;
       padding: 22px;
       width: 360px;
-      box-shadow: 3px 3px 18px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
 
     .card img {
@@ -51,10 +56,11 @@
       color: #000;
     }
 
-    .label {
-      font-size: 0.75em;
-      color: #888;
-      margin-bottom: 8px;
+    .missing-name {
+      color: red;
+      font-size: 0.85em;
+      margin-bottom: 6px;
+      text-align: center;
     }
 
     .socials {
@@ -62,6 +68,7 @@
       font-size: 0.9em;
       color: #007bff;
       text-align: center;
+      word-break: break-word;
     }
 
     .card p {
@@ -91,51 +98,39 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
     const container = document.getElementById("performers");
     container.innerHTML = "";
 
+    if (!pages || pages.length === 0) {
+      container.innerHTML = "<p>No performers yet.</p>";
+      return;
+    }
+
     pages.forEach(page => {
-      const props = page.properties;
+      const props = page.properties || {};
 
-      // 🔥 FORCE DIFFERENT TITLE LOGIC
-      const realName =
-        Object.values(props).find(p => p.type === "title")
-          ?.title?.[0]?.plain_text || "";
-
-      const stageName =
-        props["Stage name(optional)"]?.rich_text?.[0]?.plain_text || "";
+      // 🔐 LOCKED-DOWN NAME LOGIC
+      const titleProp = Object.values(props).find(p => p.type === "title");
+      const realName = titleProp?.title?.[0]?.plain_text || "";
+      const stageName = props["Stage name(optional)"]?.rich_text?.[0]?.plain_text || "";
 
       let displayName = "";
-      let nameSource = "";
+      let missingName = false;
 
       if (realName) {
         displayName = realName;
-        nameSource = "Real Name";
       } else if (stageName) {
         displayName = stageName;
-        nameSource = "Stage Name (fallback)";
       } else {
         displayName = "(Name Missing in Notion)";
-        nameSource = "NO NAME PROVIDED";
+        missingName = true;
       }
 
-      const socials =
-        props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
-
-      const city =
-        props["City"]?.rich_text?.[0]?.plain_text || "";
-
-      const state =
-        props["State"]?.rich_text?.[0]?.plain_text || "";
-
-      const phone =
-        props["Phone #"]?.rich_text?.[0]?.plain_text || "";
-
-      const genre =
-        props["Genre"]?.rich_text?.[0]?.plain_text || "";
-
-      const bio =
-        props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
-
-      const profilePic =
-        props["Profile Picture"]?.files?.[0]?.file?.url || "";
+      // Safely read other fields
+      const socials = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
+      const city = props["City"]?.rich_text?.[0]?.plain_text || "";
+      const state = props["State"]?.rich_text?.[0]?.plain_text || "";
+      const phone = props["Phone #"]?.rich_text?.[0]?.plain_text || "";
+      const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
+      const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
+      const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || "";
 
       const card = document.createElement("div");
       card.className = "card";
@@ -143,21 +138,21 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       card.innerHTML = `
         ${profilePic ? `<img src="${profilePic}" alt="${displayName}">` : ""}
         <h2>${displayName}</h2>
-        <div class="label">${nameSource}</div>
+        ${missingName ? `<div class="missing-name">Missing Name in Notion DB</div>` : ""}
         ${socials ? `<div class="socials">${socials}</div>` : ""}
         ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
         ${phone ? `<p>${phone}</p>` : ""}
         ${genre ? `<p><strong>Genre:</strong> ${genre}</p>` : ""}
-        ${bio ? `<p class="bio">  ${bio}</p>` : ""}
+        ${bio ? `<p class="bio">${bio}</p>` : ""}
       `;
 
       container.appendChild(card);
     });
   })
   .catch(err => {
+    console.error("API error:", err);
     document.getElementById("performers").innerHTML =
-      "<p>API error. Check console.</p>";
-    console.error(err);
+      "<p>Failed to load performers.</p>";
   });
 </script>
 
