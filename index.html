@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dine and Jam – Performers</title>
+  <title>Performers – Dine and Jam</title>
 
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+      background: linear-gradient(135deg, #FFD27F, #FF9E4F); /* orange-yellow gradient */
       min-height: 100vh;
       padding: 40px 20px;
       margin: 0;
@@ -29,7 +29,7 @@
     }
 
     .card {
-      background: #ffffff;
+      background: #ffffff; /* cards stay white */
       border-radius: 20px;
       padding: 24px;
       width: 360px;
@@ -60,7 +60,7 @@
       font-size: 1.7em;
       font-weight: bold;
       text-align: center;
-      background: linear-gradient(90deg, #ff8a00, #e52e71);
+      background: linear-gradient(90deg, #FF8A00, #FFD27F);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -82,7 +82,7 @@
 
     .socials a {
       padding: 6px 12px;
-      background: #007bff;
+      background: #FF8A00;
       color: white;
       border-radius: 8px;
       text-decoration: none;
@@ -91,7 +91,7 @@
     }
 
     .socials a:hover {
-      background: #0056b3;
+      background: #E67600;
     }
 
     .card p {
@@ -112,7 +112,7 @@
 
 <body>
 
-<h1>Our Performers</h1>
+<h1>Performers</h1>
 
 <div id="performers"></div>
 
@@ -146,7 +146,7 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       }
 
       const socialsRaw = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
-      const socials = socialsRaw.split(",").map(s => s.trim()); // multiple socials as links
+      const socials = socialsRaw.split(",").map(s => s.trim());
       const city = props["City"]?.rich_text?.[0]?.plain_text || "";
       const state = props["State"]?.rich_text?.[0]?.plain_text || "";
       const phone = props["Phone #"]?.rich_text?.[0]?.plain_text || "";
