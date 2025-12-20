@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dine and Jam – Performers</title>
+  <title>Dine and Jam</title>
 
   <style>
     body {
@@ -13,7 +13,6 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 10px;
     }
 
     #performers {
@@ -26,52 +25,54 @@
 
     .card {
       background: #ffffff;
+      border: 2px solid #222;
       border-radius: 14px;
-      padding: 20px;
-      width: 340px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      padding: 22px;
+      width: 360px;
+      box-shadow: 3px 3px 18px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    }
-
     .card img {
       width: 100%;
-      height: 210px;
+      height: 220px;
       object-fit: cover;
       border-radius: 10px;
       margin-bottom: 14px;
     }
 
     .card h2 {
-      margin: 6px 0;
-      font-size: 1.5em;
+      margin: 0 0 6px;
+      font-size: 1.6em;
+      font-weight: bold;
       text-align: center;
+      color: #000;
+    }
+
+    .label {
+      font-size: 0.75em;
+      color: #888;
+      margin-bottom: 8px;
     }
 
     .socials {
-      color: #007bff;
+      margin-bottom: 10px;
       font-size: 0.9em;
-      margin-bottom: 6px;
+      color: #007bff;
       text-align: center;
-      word-break: break-word;
     }
 
     .card p {
       margin: 4px 0;
       font-size: 0.95em;
-      color: #555;
+      color: #333;
       text-align: center;
     }
 
     .bio {
-      margin-top: 12px;
+      margin-top: 14px;
       white-space: pre-wrap;
     }
   </style>
@@ -79,76 +80,86 @@
 
 <body>
 
-  <h1>Our Performers</h1>
+<h1>Our Performers</h1>
 
-  <div id="performers"></div>
+<div id="performers"></div>
 
-  <script>
-    fetch("https://dineandjam-notion-api.vercel.app/api/performers")
-      .then(res => res.json())
-      .then(pages => {
-        const container = document.getElementById("performers");
-        container.innerHTML = "";
+<script>
+fetch("https://dineandjam-notion-api.vercel.app/api/performers")
+  .then(res => res.json())
+  .then(pages => {
+    const container = document.getElementById("performers");
+    container.innerHTML = "";
 
-        if (!pages || pages.length === 0) {
-          container.innerHTML = "<p>No performers yet.</p>";
-          return;
-        }
+    pages.forEach(page => {
+      const props = page.properties;
 
-        pages.forEach(page => {
-          const props = page.properties || {};
+      // 🔥 FORCE DIFFERENT TITLE LOGIC
+      const realName =
+        Object.values(props).find(p => p.type === "title")
+          ?.title?.[0]?.plain_text || "";
 
-          // 🔐 NAME LOGIC (Title → Stage Name → Fallback)
-          const titleProp = Object.values(props).find(p => p.type === "title");
+      const stageName =
+        props["Stage name(optional)"]?.rich_text?.[0]?.plain_text || "";
 
-          const name =
-            titleProp?.title?.[0]?.plain_text ||
-            props["Stage name(optional)"]?.rich_text?.[0]?.plain_text ||
-            "Unnamed Performer";
+      let displayName = "";
+      let nameSource = "";
 
-          const socials =
-            props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
+      if (realName) {
+        displayName = realName;
+        nameSource = "Real Name";
+      } else if (stageName) {
+        displayName = stageName;
+        nameSource = "Stage Name (fallback)";
+      } else {
+        displayName = "(Name Missing in Notion)";
+        nameSource = "NO NAME PROVIDED";
+      }
 
-          const city =
-            props["City"]?.rich_text?.[0]?.plain_text || "";
+      const socials =
+        props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
 
-          const state =
-            props["State"]?.rich_text?.[0]?.plain_text || "";
+      const city =
+        props["City"]?.rich_text?.[0]?.plain_text || "";
 
-          const phone =
-            props["Phone Number"]?.rich_text?.[0]?.plain_text || "";
+      const state =
+        props["State"]?.rich_text?.[0]?.plain_text || "";
 
-          const genre =
-            props["Genre"]?.rich_text?.[0]?.plain_text || "";
+      const phone =
+        props["Phone #"]?.rich_text?.[0]?.plain_text || "";
 
-          const bio =
-            props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
+      const genre =
+        props["Genre"]?.rich_text?.[0]?.plain_text || "";
 
-          const profilePic =
-            props["Profile Picture"]?.files?.[0]?.file?.url || "";
+      const bio =
+        props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
 
-          const card = document.createElement("div");
-          card.className = "card";
+      const profilePic =
+        props["Profile Picture"]?.files?.[0]?.file?.url || "";
 
-          card.innerHTML = `
-            ${profilePic ? `<img src="${profilePic}" alt="${name}">` : ""}
-            <h2>${name}</h2>
-            ${socials ? `<div class="socials">${socials}</div>` : ""}
-            ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
-            ${phone ? `<p>${phone}</p>` : ""}
-            ${genre ? `<p><strong>Genre:</strong> ${genre}</p>` : ""}
-            ${bio ? `<p class="bio">${bio}</p>` : ""}
-          `;
+      const card = document.createElement("div");
+      card.className = "card";
 
-          container.appendChild(card);
-        });
-      })
-      .catch(err => {
-        console.error("API error:", err);
-        document.getElementById("performers").innerHTML =
-          "<p>Failed to load performers.</p>";
-      });
-  </script>
+      card.innerHTML = `
+        ${profilePic ? `<img src="${profilePic}" alt="${displayName}">` : ""}
+        <h2>${displayName}</h2>
+        <div class="label">${nameSource}</div>
+        ${socials ? `<div class="socials">${socials}</div>` : ""}
+        ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
+        ${phone ? `<p>${phone}</p>` : ""}
+        ${genre ? `<p><strong>Genre:</strong> ${genre}</p>` : ""}
+        ${bio ? `<p class="bio">  ${bio}</p>` : ""}
+      `;
+
+      container.appendChild(card);
+    });
+  })
+  .catch(err => {
+    document.getElementById("performers").innerHTML =
+      "<p>API error. Check console.</p>";
+    console.error(err);
+  });
+</script>
 
 </body>
 </html>
