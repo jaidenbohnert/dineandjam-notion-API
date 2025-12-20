@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dine and Jam</title>
+  <title>Dine and Jam – Performers</title>
 
   <style>
     body {
@@ -13,6 +13,7 @@
 
     h1 {
       text-align: center;
+      margin-bottom: 10px;
     }
 
     #performers {
@@ -24,13 +25,12 @@
     }
 
     .card {
-      background-color: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 12px;
+      background: #ffffff;
+      border-radius: 14px;
       padding: 20px;
       width: 340px;
-      box-shadow: 2px 2px 14px rgba(0,0,0,0.12);
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -38,7 +38,7 @@
 
     .card:hover {
       transform: translateY(-6px);
-      box-shadow: 4px 6px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
 
     .card img {
@@ -50,17 +50,17 @@
     }
 
     .card h2 {
-      margin: 0 0 6px;
+      margin: 6px 0;
       font-size: 1.5em;
-      font-weight: bold;
       text-align: center;
     }
 
     .socials {
-      margin-bottom: 10px;
-      font-size: 0.9em;
-      text-align: center;
       color: #007bff;
+      font-size: 0.9em;
+      margin-bottom: 6px;
+      text-align: center;
+      word-break: break-word;
     }
 
     .card p {
@@ -71,7 +71,7 @@
     }
 
     .bio {
-      margin-top: 14px;
+      margin-top: 12px;
       white-space: pre-wrap;
     }
   </style>
@@ -88,6 +88,7 @@
       .then(res => res.json())
       .then(pages => {
         const container = document.getElementById("performers");
+        container.innerHTML = "";
 
         if (!pages || pages.length === 0) {
           container.innerHTML = "<p>No performers yet.</p>";
@@ -95,14 +96,15 @@
         }
 
         pages.forEach(page => {
-          const props = page.properties;
+          const props = page.properties || {};
 
-          // ✅ BULLETPROOF TITLE FIX
+          // 🔐 NAME LOGIC (Title → Stage Name → Fallback)
+          const titleProp = Object.values(props).find(p => p.type === "title");
+
           const name =
-            Object.values(props)
-              .find(p => p.type === "title")
-              ?.title?.[0]?.plain_text
-            || "Unnamed Performer";
+            titleProp?.title?.[0]?.plain_text ||
+            props["Stage name(optional)"]?.rich_text?.[0]?.plain_text ||
+            "Unnamed Performer";
 
           const socials =
             props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
@@ -135,7 +137,7 @@
             ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
             ${phone ? `<p>${phone}</p>` : ""}
             ${genre ? `<p><strong>Genre:</strong> ${genre}</p>` : ""}
-            ${bio ? `<p class="bio">  ${bio}</p>` : ""}
+            ${bio ? `<p class="bio">${bio}</p>` : ""}
           `;
 
           container.appendChild(card);
@@ -143,6 +145,8 @@
       })
       .catch(err => {
         console.error("API error:", err);
+        document.getElementById("performers").innerHTML =
+          "<p>Failed to load performers.</p>";
       });
   </script>
 
