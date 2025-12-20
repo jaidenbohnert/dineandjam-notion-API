@@ -97,9 +97,11 @@
         pages.forEach(page => {
           const props = page.properties;
 
-          // 🔑 EXACT NOTION PROPERTY NAMES
+          // ✅ BULLETPROOF TITLE FIX
           const name =
-            props["Name (performer’s real name)"]?.title?.[0]?.plain_text
+            Object.values(props)
+              .find(p => p.type === "title")
+              ?.title?.[0]?.plain_text
             || "Unnamed Performer";
 
           const socials =
@@ -146,9 +148,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
