@@ -45,6 +45,7 @@
       height: 220px;
       object-fit: cover;
       border-radius: 10px;
+      margin-top: 10px;
       margin-bottom: 14px;
     }
 
@@ -136,9 +137,9 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       card.className = "card";
 
       card.innerHTML = `
-        ${profilePic ? `<img src="${profilePic}" alt="${displayName}">` : ""}
         <h2>${displayName}</h2>
         ${missingName ? `<div class="missing-name">Missing Name in Notion DB</div>` : ""}
+        ${profilePic ? `<img src="${profilePic}" alt="${displayName}">` : ""}
         ${socials ? `<div class="socials">${socials}</div>` : ""}
         ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
         ${phone ? `<p>${phone}</p>` : ""}
