@@ -120,6 +120,26 @@
       color: #444;
       text-align: center;
     }
+
+    /* HIRE BUTTON */
+    .hire-btn {
+      display: block;
+      width: 60%;
+      margin: 15px auto 0;
+      padding: 10px 0;
+      background-color: #ff7a00;
+      color: white;
+      font-size: 1em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .hire-btn:hover {
+      background-color: #e06600;
+    }
   </style>
 </head>
 
@@ -134,6 +154,8 @@
   <div class="modal-content">
     <span class="close" id="closeModal">&times;</span>
     <div id="modalBody"></div>
+    <!-- Hire button (does nothing yet) -->
+    <button id="hireBtn" class="hire-btn">Hire Performer</button>
   </div>
 </div>
 
@@ -169,7 +191,6 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       const bio =
         props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
 
-      // ✅ BULLETPROOF PROFILE PIC FIX
       const profilePic =
         props["Profile Picture"]?.files?.[0]?.file?.url ||
         props["Profile Picture"]?.files?.[0]?.external?.url ||
@@ -197,6 +218,7 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
 function openModal(data) {
   const modal = document.getElementById("modal");
   const body = document.getElementById("modalBody");
+  const hireBtn = document.getElementById("hireBtn");
 
   body.innerHTML = `
     ${data.profilePic ? `<img src="${data.profilePic}">` : ""}
@@ -207,6 +229,15 @@ function openModal(data) {
     ${data.genre ? `<p><strong>Genre:</strong> ${data.genre}</p>` : ""}
     ${data.bio ? `<p>${data.bio}</p>` : ""}
   `;
+
+  // Show the hire button
+  hireBtn.style.display = "block";
+
+  // (Does nothing yet)
+  hireBtn.onclick = () => {
+    console.log(`Hire button clicked for ${data.name}`);
+    // Future functionality goes here
+  }
 
   modal.style.display = "flex";
 }
