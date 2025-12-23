@@ -77,11 +77,13 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      overflow-y: auto;
+      padding: 20px;
     }
 
     .modal-content {
       background: white;
-      width: 90%;
+      width: 100%;
       max-width: 520px;
       border-radius: 16px;
       padding: 25px;
@@ -140,6 +142,45 @@
     .hire-btn:hover {
       background-color: #e06600;
     }
+
+    /* BOOKING FORM */
+    .booking-form {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .booking-form label {
+      display: block;
+      margin: 10px 0 4px;
+      font-weight: bold;
+    }
+
+    .booking-form input,
+    .booking-form textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+
+    .checkout-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .checkout-btn:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 
@@ -154,8 +195,26 @@
   <div class="modal-content">
     <span class="close" id="closeModal">&times;</span>
     <div id="modalBody"></div>
-    <!-- Hire button (does nothing yet) -->
+    <!-- Hire button -->
     <button id="hireBtn" class="hire-btn">Hire Performer</button>
+
+    <!-- Booking form -->
+    <form id="bookingForm" class="booking-form">
+      <label for="restaurantName">Restaurant Name</label>
+      <input type="text" id="restaurantName" required>
+
+      <label for="eventDate">Event Date</label>
+      <input type="date" id="eventDate" required>
+
+      <label for="eventTime">Event Time</label>
+      <input type="time" id="eventTime" required>
+
+      <label for="message">Message / Details</label>
+      <textarea id="message" rows="3"></textarea>
+
+      <!-- Stripe Checkout button placeholder -->
+      <button type="button" id="checkoutBtn" class="checkout-btn">Pay & Book Performer</button>
+    </form>
   </div>
 </div>
 
@@ -219,6 +278,8 @@ function openModal(data) {
   const modal = document.getElementById("modal");
   const body = document.getElementById("modalBody");
   const hireBtn = document.getElementById("hireBtn");
+  const bookingForm = document.getElementById("bookingForm");
+  const checkoutBtn = document.getElementById("checkoutBtn");
 
   body.innerHTML = `
     ${data.profilePic ? `<img src="${data.profilePic}">` : ""}
@@ -230,13 +291,32 @@ function openModal(data) {
     ${data.bio ? `<p>${data.bio}</p>` : ""}
   `;
 
-  // Show the hire button
+  // Show Hire button, hide form initially
   hireBtn.style.display = "block";
+  bookingForm.style.display = "none";
 
-  // (Does nothing yet)
   hireBtn.onclick = () => {
-    console.log(`Hire button clicked for ${data.name}`);
-    // Future functionality goes here
+    hireBtn.style.display = "none";
+    bookingForm.style.display = "block";
+  };
+
+  // Placeholder for Stripe Checkout
+  checkoutBtn.onclick = () => {
+    const restaurantName = document.getElementById("restaurantName").value;
+    const eventDate = document.getElementById("eventDate").value;
+    const eventTime = document.getElementById("eventTime").value;
+    const message = document.getElementById("message").value;
+
+    console.log("Booking Details:", {
+      performer: data.name,
+      restaurantName,
+      eventDate,
+      eventTime,
+      message
+    });
+
+    alert("Booking submitted! (Stripe integration not active yet)");
+    // TODO: Integrate Stripe Checkout here
   }
 
   modal.style.display = "flex";
