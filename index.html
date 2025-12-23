@@ -151,19 +151,35 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
           .find(p => p.type === "title")
           ?.title?.[0]?.plain_text || "Unnamed Performer";
 
-      const socials = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
-      const city = props["City"]?.rich_text?.[0]?.plain_text || "";
-      const state = props["State"]?.rich_text?.[0]?.plain_text || "";
-      const phone = props["Phone #"]?.rich_text?.[0]?.plain_text || "";
-      const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
-      const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
-      const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || "";
+      const socials =
+        props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
+
+      const city =
+        props["City"]?.rich_text?.[0]?.plain_text || "";
+
+      const state =
+        props["State"]?.rich_text?.[0]?.plain_text || "";
+
+      const phone =
+        props["Phone #"]?.rich_text?.[0]?.plain_text || "";
+
+      const genre =
+        props["Genre"]?.rich_text?.[0]?.plain_text || "";
+
+      const bio =
+        props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
+
+      // ✅ BULLETPROOF PROFILE PIC FIX
+      const profilePic =
+        props["Profile Picture"]?.files?.[0]?.file?.url ||
+        props["Profile Picture"]?.files?.[0]?.external?.url ||
+        "";
 
       const card = document.createElement("div");
       card.className = "card";
 
       card.innerHTML = `
-        ${profilePic ? `<img src="${profilePic}">` : ""}
+        ${profilePic ? `<img src="${profilePic}" alt="${name}">` : ""}
         <h2>${name}</h2>
         ${socials ? `<div class="socials">${socials}</div>` : ""}
         ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
