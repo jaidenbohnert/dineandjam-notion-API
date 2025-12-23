@@ -195,6 +195,7 @@
   <div class="modal-content">
     <span class="close" id="closeModal">&times;</span>
     <div id="modalBody"></div>
+
     <!-- Hire button -->
     <button id="hireBtn" class="hire-btn">Hire Performer</button>
 
@@ -212,7 +213,7 @@
       <label for="message">Message / Details</label>
       <textarea id="message" rows="3"></textarea>
 
-      <!-- Stripe Checkout button placeholder -->
+      <!-- Redirect to Payment Info page -->
       <button type="button" id="checkoutBtn" class="checkout-btn">Pay & Book Performer</button>
     </form>
   </div>
@@ -291,7 +292,6 @@ function openModal(data) {
     ${data.bio ? `<p>${data.bio}</p>` : ""}
   `;
 
-  // Show Hire button, hide form initially
   hireBtn.style.display = "block";
   bookingForm.style.display = "none";
 
@@ -300,24 +300,15 @@ function openModal(data) {
     bookingForm.style.display = "block";
   };
 
-  // Placeholder for Stripe Checkout
+  // Redirect to payment.html with parameters
   checkoutBtn.onclick = () => {
-    const restaurantName = document.getElementById("restaurantName").value;
-    const eventDate = document.getElementById("eventDate").value;
-    const eventTime = document.getElementById("eventTime").value;
-    const message = document.getElementById("message").value;
+    const restaurantName = encodeURIComponent(document.getElementById("restaurantName").value);
+    const eventDate = encodeURIComponent(document.getElementById("eventDate").value);
+    const eventTime = encodeURIComponent(document.getElementById("eventTime").value);
+    const performer = encodeURIComponent(data.name);
 
-    console.log("Booking Details:", {
-      performer: data.name,
-      restaurantName,
-      eventDate,
-      eventTime,
-      message
-    });
-
-    alert("Booking submitted! (Stripe integration not active yet)");
-    // TODO: Integrate Stripe Checkout here
-  }
+    window.location.href = `payment.html?performer=${performer}&restaurant=${restaurantName}&date=${eventDate}&time=${eventTime}`;
+  };
 
   modal.style.display = "flex";
 }
