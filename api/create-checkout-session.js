@@ -1,38 +1,46 @@
 import Stripe from "stripe";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
-  if (req.method === "POST") {
-    const { performerName, performerStripeId, price } = req.body;
+  if (req.method !== "POST") {
+    return res.status(405).end("Method Not Allowed");
+  }
 
-    try {
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price_data: {
-              currency: "usd",
-              product_data: { name: `Booking: ${performerName}` },
-              unit_amount: price * 100,
-            },
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        payment_intent_data: {
-          application_fee_amount: Math.round(price * 100 * 0.05), // 5% fee
-          transfer_data: { destination: performerStripeId },
-        },
-        success_url: "https://your-site-url/success",
-        cancel_url: "https://your-site-url/cancel",
-      });
+  try {
+    const { performerName, stripeAccountId } = req.body;
 
-      res.status(200).json({ id: session.id });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+    if (!stripeAccountId) {
+      return res.status(400).json({ error: "Performer not ready for payouts" });
     }
-  } else {
-    res.setHeader("Allow", "POST");
-    res.status(405).end("Method Not Allowed");
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: `Booking: ${performerName}`,
+            },
+            unit_amount: 5000, // $50 example
+          },
+          quantity: 1,
+        },
+      ],
+      payment_intent_data: {
+        application_fee_amount: 250, // 5% of $50
+        transfer_data: {
+          destination: stripeAccountId,
+        },
+      },
+      success_url: "https://dineandjam.com/success",
+      cancel_url: "https://dineandjam.com/cancel",
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 }
