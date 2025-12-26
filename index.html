@@ -2,326 +2,172 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dine and Jam</title>
+  <title>Performers</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #ffb347, #ffcc33);
+      background: linear-gradient(135deg, #FFD700, #FFA500);
       padding: 40px;
-      margin: 0;
     }
 
     h1 {
       text-align: center;
-      font-size: 2.6em;
+      color: #fff;
+      font-size: 2.2em;
       margin-bottom: 30px;
-      color: #222;
+      text-shadow: 2px 2px #ff8c00;
     }
 
     #performers {
       display: flex;
       flex-wrap: wrap;
-      gap: 30px;
+      gap: 25px;
       justify-content: center;
     }
 
     .card {
-      background: white;
-      border-radius: 14px;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      padding: 20px;
       width: 340px;
-      padding: 18px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.15);
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-align: center;
+      box-shadow: 2px 2px 16px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 14px 30px rgba(0,0,0,0.25);
+      transform: translateY(-6px);
+      box-shadow: 4px 6px 22px rgba(0,0,0,0.25);
     }
 
     .card img {
       width: 100%;
-      height: 220px;
+      height: 210px;
       object-fit: cover;
       border-radius: 12px;
       margin-bottom: 14px;
     }
 
     .card h2 {
-      margin: 0;
+      margin: 0 0 6px;
       font-size: 1.5em;
       font-weight: bold;
+      text-align: center;
     }
 
     .socials {
-      color: #ff7a00;
-      margin: 6px 0 10px;
-      font-size: 0.95em;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      text-align: center;
+      color: #007bff;
     }
 
     .card p {
-      margin: 5px 0;
-      color: #555;
+      margin: 4px 0;
       font-size: 0.95em;
-    }
-
-    /* MODAL */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .modal-content {
-      background: white;
-      width: 100%;
-      max-width: 520px;
-      border-radius: 16px;
-      padding: 25px;
-      position: relative;
-      animation: fadeIn 0.25s ease;
-    }
-
-    @keyframes fadeIn {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .modal img {
-      width: 100%;
-      height: 260px;
-      object-fit: cover;
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-
-    .modal h2 {
-      margin-top: 0;
+      color: #555;
       text-align: center;
     }
 
-    .close {
-      position: absolute;
-      top: 14px;
-      right: 18px;
-      font-size: 26px;
-      cursor: pointer;
+    .bio {
+      margin-top: 14px;
+      white-space: pre-wrap;
     }
 
-    .modal p {
-      margin: 8px 0;
-      color: #444;
-      text-align: center;
-    }
-
-    /* HIRE BUTTON */
-    .hire-btn {
-      display: block;
-      width: 60%;
-      margin: 15px auto 0;
-      padding: 10px 0;
-      background-color: #ff7a00;
-      color: white;
+    .pay-button {
+      margin-top: 12px;
+      padding: 10px 18px;
+      background-color: #ff8c00;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
       font-size: 1em;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background-color 0.2s;
     }
 
-    .hire-btn:hover {
-      background-color: #e06600;
-    }
-
-    /* BOOKING FORM */
-    .booking-form {
-      display: none;
-      margin-top: 20px;
-    }
-
-    .booking-form label {
-      display: block;
-      margin: 10px 0 4px;
-      font-weight: bold;
-    }
-
-    .booking-form input,
-    .booking-form textarea {
-      width: 100%;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      margin-bottom: 12px;
-    }
-
-    .checkout-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background-color: #28a745;
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .checkout-btn:hover {
-      background-color: #218838;
+    .pay-button:hover {
+      background-color: #ff7000;
     }
   </style>
 </head>
 
 <body>
 
-<h1>Performers</h1>
+  <h1>Performers</h1>
 
-<div id="performers"></div>
+  <div id="performers"></div>
 
-<!-- MODAL -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="closeModal">&times;</span>
-    <div id="modalBody"></div>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    fetch("https://dineandjam-notion-api.vercel.app/api/performers")
+      .then(res => res.json())
+      .then(pages => {
+        const container = document.getElementById("performers");
 
-    <!-- Hire button -->
-    <button id="hireBtn" class="hire-btn">Hire Performer</button>
+        if (!pages || pages.length === 0) {
+          container.innerHTML = "<p>No performers yet.</p>";
+          return;
+        }
 
-    <!-- Booking form -->
-    <form id="bookingForm" class="booking-form">
-      <label for="restaurantName">Restaurant Name</label>
-      <input type="text" id="restaurantName" required>
+        pages.forEach(page => {
+          const props = page.properties;
 
-      <label for="eventDate">Event Date</label>
-      <input type="date" id="eventDate" required>
+          // Performer data
+          const name = props["Name (performer’s real name)"]?.title?.[0]?.plain_text || "Unnamed Performer";
+          const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || "";
+          const socials = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
+          const city = props["City"]?.rich_text?.[0]?.plain_text || "";
+          const state = props["State"]?.rich_text?.[0]?.plain_text || "";
+          const phone = props["Phone #"]?.rich_text?.[0]?.plain_text || "";
+          const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
+          const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
 
-      <label for="eventTime">Event Time</label>
-      <input type="time" id="eventTime" required>
+          const performerStripeId = props["Stripe Account ID"]?.rich_text?.[0]?.plain_text || ""; // store performers Stripe account ID
 
-      <label for="message">Message / Details</label>
-      <textarea id="message" rows="3"></textarea>
+          const card = document.createElement("div");
+          card.className = "card";
 
-      <!-- Redirect to Payment Info page -->
-      <button type="button" id="checkoutBtn" class="checkout-btn">Pay & Book Performer</button>
-    </form>
-  </div>
-</div>
+          card.innerHTML = `
+            ${profilePic ? `<img src="${profilePic}" alt="${name}">` : ""}
+            <h2>${name}</h2>
+            ${socials ? `<div class="socials">${socials}</div>` : ""}
+            ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
+            ${phone ? `<p>${phone}</p>` : ""}
+            ${genre ? `<p><strong>Genre:</strong> ${genre}</p>` : ""}
+            ${bio ? `<p class="bio">  ${bio}</p>` : ""}
+            ${performerStripeId ? `<button class="pay-button">Pay & Book</button>` : ""}
+          `;
 
-<script>
-fetch("https://dineandjam-notion-api.vercel.app/api/performers")
-  .then(res => res.json())
-  .then(pages => {
-    const container = document.getElementById("performers");
+          container.appendChild(card);
 
-    pages.forEach(page => {
-      const props = page.properties;
+          // Add Stripe checkout handler
+          if (performerStripeId) {
+            const button = card.querySelector(".pay-button");
+            button.addEventListener("click", async () => {
+              const response = await fetch("/api/create-checkout-session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  performerName: name,
+                  performerStripeId: performerStripeId,
+                  price: 200 // example booking amount
+                }),
+              });
 
-      const name =
-        Object.values(props)
-          .find(p => p.type === "title")
-          ?.title?.[0]?.plain_text || "Unnamed Performer";
-
-      const socials =
-        props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
-
-      const city =
-        props["City"]?.rich_text?.[0]?.plain_text || "";
-
-      const state =
-        props["State"]?.rich_text?.[0]?.plain_text || "";
-
-      const phone =
-        props["Phone #"]?.rich_text?.[0]?.plain_text || "";
-
-      const genre =
-        props["Genre"]?.rich_text?.[0]?.plain_text || "";
-
-      const bio =
-        props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
-
-      const profilePic =
-        props["Profile Picture"]?.files?.[0]?.file?.url ||
-        props["Profile Picture"]?.files?.[0]?.external?.url ||
-        "";
-
-      const card = document.createElement("div");
-      card.className = "card";
-
-      card.innerHTML = `
-        ${profilePic ? `<img src="${profilePic}" alt="${name}">` : ""}
-        <h2>${name}</h2>
-        ${socials ? `<div class="socials">${socials}</div>` : ""}
-        ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
-        ${genre ? `<p><strong>${genre}</strong></p>` : ""}
-      `;
-
-      card.onclick = () => openModal({
-        name, socials, city, state, phone, genre, bio, profilePic
-      });
-
-      container.appendChild(card);
-    });
-  });
-
-function openModal(data) {
-  const modal = document.getElementById("modal");
-  const body = document.getElementById("modalBody");
-  const hireBtn = document.getElementById("hireBtn");
-  const bookingForm = document.getElementById("bookingForm");
-  const checkoutBtn = document.getElementById("checkoutBtn");
-
-  body.innerHTML = `
-    ${data.profilePic ? `<img src="${data.profilePic}">` : ""}
-    <h2>${data.name}</h2>
-    ${data.socials ? `<p><strong>Socials:</strong> ${data.socials}</p>` : ""}
-    ${(data.city || data.state) ? `<p><strong>Location:</strong> ${data.city}${data.city && data.state ? ", " : ""}${data.state}</p>` : ""}
-    ${data.phone ? `<p><strong>Phone:</strong> ${data.phone}</p>` : ""}
-    ${data.genre ? `<p><strong>Genre:</strong> ${data.genre}</p>` : ""}
-    ${data.bio ? `<p>${data.bio}</p>` : ""}
-  `;
-
-  hireBtn.style.display = "block";
-  bookingForm.style.display = "none";
-
-  hireBtn.onclick = () => {
-    hireBtn.style.display = "none";
-    bookingForm.style.display = "block";
-  };
-
-  // Redirect to payment.html with parameters
-  checkoutBtn.onclick = () => {
-    const restaurantName = encodeURIComponent(document.getElementById("restaurantName").value);
-    const eventDate = encodeURIComponent(document.getElementById("eventDate").value);
-    const eventTime = encodeURIComponent(document.getElementById("eventTime").value);
-    const performer = encodeURIComponent(data.name);
-
-    window.location.href = `payment.html?performer=${performer}&restaurant=${restaurantName}&date=${eventDate}&time=${eventTime}`;
-  };
-
-  modal.style.display = "flex";
-}
-
-document.getElementById("closeModal").onclick = () =>
-  document.getElementById("modal").style.display = "none";
-
-document.getElementById("modal").onclick = e => {
-  if (e.target.id === "modal") {
-    e.target.style.display = "none";
-  }
-};
-</script>
+              const session = await response.json();
+              const stripe = Stripe(YOUR SECRET STRIPE KEY); // Replace with your publishable key
+              stripe.redirectToCheckout({ sessionId: session.id });
+            });
+          }
+        });
+      })
+      .catch(err => console.error("API error:", err));
+  </script>
 
 </body>
 </html>
