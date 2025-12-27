@@ -1,122 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Payment Info - Dine & Jam</title>
+  <meta charset="UTF-8" />
+  <title>Dine & Jam – Book Performer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Stripe.js (safe to include on frontend) -->
+  <script src="https://js.stripe.com/v3/"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #ffb347, #ffcc33);
+      background: #f7f7f7;
       padding: 40px;
-      margin: 0;
-      color: #333;
-    }
-
-    h1 {
       text-align: center;
-      font-size: 2.4em;
-      margin-bottom: 20px;
     }
 
-    .container {
-      max-width: 600px;
-      margin: auto;
+    .card {
       background: white;
-      border-radius: 16px;
       padding: 30px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.15);
-    }
-
-    .info {
-      margin-bottom: 20px;
-      font-size: 1.1em;
-    }
-
-    .info p {
-      margin: 8px 0;
-    }
-
-    .fee {
-      font-weight: bold;
-      color: #ff7a00;
-      margin-bottom: 20px;
-    }
-
-    .instructions {
-      background: #f9f9f9;
-      padding: 15px;
+      max-width: 500px;
+      margin: auto;
       border-radius: 10px;
-      font-size: 1em;
-      line-height: 1.5;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
-    .back-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      text-align: center;
-      background-color: #ff7a00;
+    button {
+      background: black;
       color: white;
-      font-weight: bold;
       border: none;
-      border-radius: 8px;
-      text-decoration: none;
+      padding: 15px 25px;
+      font-size: 16px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 1em;
-      transition: background 0.2s ease;
+      margin-top: 20px;
     }
 
-    .back-btn:hover {
-      background-color: #e06600;
+    button:hover {
+      opacity: 0.85;
     }
   </style>
 </head>
 <body>
 
-<h1>Payment Information</h1>
+  <div class="card">
+    <h1>Book This Performer</h1>
+    <p>Secure payment powered by Stripe</p>
 
-<div class="container">
-  <div class="info">
-    <p><strong>Performer:</strong> <span id="performerName"></span></p>
-    <p><strong>Restaurant:</strong> <span id="restaurantName"></span></p>
-    <p><strong>Event Date:</strong> <span id="eventDate"></span></p>
-    <p><strong>Event Time:</strong> <span id="eventTime"></span></p>
+    <button id="pay-button">
+      Pay & Book
+    </button>
   </div>
 
-  <div class="fee" id="platformFee">
-    <!-- Platform fee displayed here -->
-  </div>
+  <script>
+    // 🔹 Replace with YOUR Stripe publishable key (pk_live_...)
+    const stripe = Stripe("pk_live_XXXXXXXXXXXXXXXXXXXX");
 
-  <div class="instructions">
-    <p><strong>Payment Instructions:</strong></p>
-    <ul>
-      <li>Send payment via Stripe, PayPal, or bank transfer (details to be provided after confirming booking).</li>
-      <li>Include performer name and event date in your payment reference.</li>
-      <li>5% of the total payment will be taken as a platform fee for Dine & Jam.</li>
-    </ul>
-  </div>
+    // 🔹 Get performer ID from URL
+    // Example: payment.html?performer=abc123
+    const params = new URLSearchParams(window.location.search);
+    const performerId = params.get("performer");
 
-  <a href="index.html" class="back-btn">Back to Performers</a>
-</div>
+    if (!performerId) {
+      alert("Missing performer ID.");
+    }
 
-<script>
-  // Read URL parameters
-  const params = new URLSearchParams(window.location.search);
-  const performer = params.get("performer") || "N/A";
-  const restaurant = params.get("restaurant") || "N/A";
-  const date = params.get("date") || "N/A";
-  const time = params.get("time") || "N/A";
+    document.getElementById("pay-button").addEventListener("click", async () => {
+      try {
+        const response = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            performerId: performerId
+          })
+        });
 
-  // Fill in the page
-  document.getElementById("performerName").innerText = performer;
-  document.getElementById("restaurantName").innerText = restaurant;
-  document.getElementById("eventDate").innerText = date;
-  document.getElementById("eventTime").innerText = time;
+        const data = await response.json();
 
-  // Show 5% platform fee
-  document.getElementById("platformFee").innerText = "5% of total payment will be collected as a platform fee by Dine & Jam";
-</script>
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        // Redirect to Stripe Checkout
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.sessionId
+        });
+
+        if (result.error) {
+          alert(result.error.message);
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong. Please try again.");
+      }
+    });
+  </script>
 
 </body>
 </html>
