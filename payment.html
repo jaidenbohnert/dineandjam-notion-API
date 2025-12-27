@@ -2,103 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dine & Jam – Book Performer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Stripe.js (safe to include on frontend) -->
-  <script src="https://js.stripe.com/v3/"></script>
-
+  <title>Book Performer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      padding: 40px;
-      text-align: center;
+      background: linear-gradient(135deg, #ffb347, #ffcc33);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
 
-    .card {
+    .box {
       background: white;
       padding: 30px;
-      max-width: 500px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      width: 360px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
     button {
-      background: black;
-      color: white;
-      border: none;
-      padding: 15px 25px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
       margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background: #28a745;
+      color: white;
+      font-size: 1em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
     button:hover {
-      opacity: 0.85;
+      background: #218838;
     }
   </style>
 </head>
+
 <body>
-
-  <div class="card">
-    <h1>Book This Performer</h1>
+  <div class="box">
+    <h2>Book This Performer</h2>
     <p>Secure payment powered by Stripe</p>
-
-    <button id="pay-button">
-      Pay & Book
-    </button>
+    <button id="payBtn">Pay & Book</button>
   </div>
 
   <script>
-    // 🔹 Replace with YOUR Stripe publishable key (pk_live_...)
-    const stripe = Stripe("pk_live_51Shdz17Xpmw7ZzMNttHRFVM6FRk4SZLsTcSrSroycddpYQLKnWSmZ0pBahujj2ur9C7Jg0voM2XGMnoJtw3Mi7GV0037gCcrdC");
-
-    // 🔹 Get performer ID from URL
-    // Example: payment.html?performer=abc123
     const params = new URLSearchParams(window.location.search);
-    const performerId = params.get("performer");
+    const performer = params.get("performer") || "Performer";
+    const stripeAccountId = params.get("acct");
 
-    if (!performerId) {
-      alert("Missing performer ID.");
-    }
+    document.getElementById("payBtn").onclick = async () => {
+      const res = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          performerName: performer,
+          stripeAccountId: stripeAccountId
+        })
+      });
 
-    document.getElementById("pay-button").addEventListener("click", async () => {
-      try {
-        const response = await fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            performerId: performerId
-          })
-        });
+      const data = await res.json();
 
-        const data = await response.json();
-
-        if (data.error) {
-          alert(data.error);
-          return;
-        }
-
-        // Redirect to Stripe Checkout
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.sessionId
-        });
-
-        if (result.error) {
-          alert(result.error.message);
-        }
-
-      } catch (err) {
-        console.error(err);
-        alert("Something went wrong. Please try again.");
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Stripe error. Check setup.");
       }
-    });
+    };
   </script>
-
 </body>
 </html>
