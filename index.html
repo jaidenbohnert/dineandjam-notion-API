@@ -229,7 +229,8 @@ function openModal(data) {
     hireBtn.disabled = false;
     notice.textContent = "";
     hireBtn.onclick = () => {
-      window.location.href = `payment.html?performer=${encodeURIComponent(data.name)}&acct=${encodeURIComponent(data.stripeAccountId)}`;
+      window.location.href = "payment.html";
+
     };
   }
 
