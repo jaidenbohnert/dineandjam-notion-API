@@ -1,29 +1,25 @@
-import { Client } from "@notionhq/client";
-
-const notion = new Client({
-  auth: process.env.NOTION_SECRET,
-});
-
 export default async function handler(req, res) {
-  // ✅ CORS HEADERS — THIS IS THE FIX
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // Handle preflight
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
 
   try {
-    const response = await notion.databases.query({
-      database_id: "2c4abfbb44b980b3a34ad366311d8388",
-    });
+    const NOTION_API_KEY = process.env.NOTION_API_KEY;
+    const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
-    res.status(200).json(response.results);
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${NOTION_API_KEY}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const data = await response.json();
+    res.status(200).json(data.results);
   } catch (error) {
-    console.error("Notion API error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to fetch performers" });
   }
 }
-
