@@ -1,18 +1,9 @@
 export default async function handler(req, res) {
-  // Allow browser access
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
   try {
-    const NOTION_API_KEY = process.env.NOTION_API_KEY;
+    const NOTION_SECRET = process.env.NOTION_SECRET;
     const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
-    if (!NOTION_API_KEY || !DATABASE_ID) {
+    if (!NOTION_SECRET || !DATABASE_ID) {
       return res.status(500).json({
         error: "Missing Notion API key or Database ID",
       });
@@ -23,27 +14,25 @@ export default async function handler(req, res) {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${NOTION_API_KEY}`,
+          "Authorization": `Bearer ${NOTION_SECRET}`,
           "Notion-Version": "2022-06-28",
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({}),
       }
     );
 
     const data = await response.json();
 
     if (!response.ok) {
-      return res.status(500).json({
+      return res.status(response.status).json({
         error: "Notion API error",
         details: data,
       });
     }
 
-    return res.status(200).json(data.results);
-  } catch (error) {
-    return res.status(500).json({
-      error: "Server error fetching performers",
-      message: error.message,
-    });
+    res.status(200).json(data.results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 }
