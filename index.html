@@ -50,25 +50,6 @@
       margin-bottom: 14px;
     }
 
-    .card h2 {
-      margin: 0;
-      font-size: 1.5em;
-      font-weight: bold;
-    }
-
-    .socials {
-      color: #ff7a00;
-      margin: 6px 0 10px;
-      font-size: 0.95em;
-    }
-
-    .card p {
-      margin: 5px 0;
-      color: #555;
-      font-size: 0.95em;
-    }
-
-    /* MODAL */
     .modal {
       display: none;
       position: fixed;
@@ -82,19 +63,11 @@
 
     .modal-content {
       background: white;
-      width: 100%;
       max-width: 520px;
+      width: 100%;
       border-radius: 16px;
       padding: 25px;
       position: relative;
-    }
-
-    .modal img {
-      width: 100%;
-      height: 260px;
-      object-fit: cover;
-      border-radius: 12px;
-      margin-bottom: 16px;
     }
 
     .close {
@@ -106,13 +79,11 @@
     }
 
     .hire-btn {
-      display: block;
       width: 100%;
       margin-top: 15px;
       padding: 12px;
       background-color: #ff7a00;
       color: white;
-      font-size: 1em;
       font-weight: bold;
       border: none;
       border-radius: 8px;
@@ -120,13 +91,12 @@
     }
 
     .hire-btn.disabled {
-      background-color: #ccc;
+      background: #ccc;
       cursor: not-allowed;
     }
 
     .notice {
       margin-top: 12px;
-      font-size: 0.9em;
       color: #b00020;
       text-align: center;
     }
@@ -136,7 +106,14 @@
 <body>
 
 <h1>Performers</h1>
-<div id="performers"></div>
+
+<!-- THIS GUARANTEES THE PAGE NEVER LOOKS EMPTY -->
+<div id="performers">
+  <div class="card">
+    <h2>Loading performers…</h2>
+    <p>If this stays here, the API is broken (not your HTML).</p>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div id="modal" class="modal">
@@ -149,32 +126,42 @@
 </div>
 
 <script>
+const container = document.getElementById("performers");
+
+/* STEP 1 — FORCE A TEST CARD */
+function addTestCard() {
+  container.innerHTML = "";
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <h2>TEST PERFORMER</h2>
+    <p>If you see this, JS works.</p>
+  `;
+  container.appendChild(card);
+}
+
+addTestCard();
+
+/* STEP 2 — FETCH REAL DATA */
 fetch("https://dineandjam-notion-api.vercel.app/api/performers")
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error("API failed");
+    return res.json();
+  })
   .then(pages => {
-    const container = document.getElementById("performers");
+    container.innerHTML = "";
+
+    if (!pages || pages.length === 0) {
+      container.innerHTML = "<p>No performers found.</p>";
+      return;
+    }
 
     pages.forEach(page => {
-      const props = page.properties;
+      const props = page.properties || {};
 
       const name =
         Object.values(props).find(p => p.type === "title")
         ?.title?.[0]?.plain_text || "Unnamed Performer";
-
-      const socials =
-        props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
-
-      const city =
-        props["City"]?.rich_text?.[0]?.plain_text || "";
-
-      const state =
-        props["State"]?.rich_text?.[0]?.plain_text || "";
-
-      const phone =
-        props["Phone #"]?.rich_text?.[0]?.plain_text || "";
-
-      const genre =
-        props["Genre"]?.rich_text?.[0]?.plain_text || "";
 
       const bio =
         props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
@@ -182,27 +169,22 @@ fetch("https://dineandjam-notion-api.vercel.app/api/performers")
       const stripeAccountId =
         props["Stripe Account ID"]?.rich_text?.[0]?.plain_text || "";
 
-      const profilePic =
-        props["Profile Picture"]?.files?.[0]?.file?.url ||
-        props["Profile Picture"]?.files?.[0]?.external?.url || "";
-
       const card = document.createElement("div");
       card.className = "card";
+      card.innerHTML = `<h2>${name}</h2><p>${bio}</p>`;
 
-      card.innerHTML = `
-        ${profilePic ? `<img src="${profilePic}">` : ""}
-        <h2>${name}</h2>
-        ${socials ? `<div class="socials">${socials}</div>` : ""}
-        ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
-        ${genre ? `<p><strong>${genre}</strong></p>` : ""}
-      `;
-
-      card.onclick = () => openModal({
-        name, socials, city, state, phone, genre, bio, profilePic, stripeAccountId
-      });
-
+      card.onclick = () => openModal({ name, bio, stripeAccountId });
       container.appendChild(card);
     });
+  })
+  .catch(err => {
+    container.innerHTML = `
+      <div class="card">
+        <h2>ERROR</h2>
+        <p>The performers API is not responding.</p>
+      </div>
+    `;
+    console.error(err);
   });
 
 function openModal(data) {
@@ -211,26 +193,18 @@ function openModal(data) {
   const hireBtn = document.getElementById("hireBtn");
   const notice = document.getElementById("notice");
 
-  body.innerHTML = `
-    ${data.profilePic ? `<img src="${data.profilePic}">` : ""}
-    <h2>${data.name}</h2>
-    ${data.bio ? `<p>${data.bio}</p>` : ""}
-  `;
+  body.innerHTML = `<h2>${data.name}</h2><p>${data.bio}</p>`;
 
   if (!data.stripeAccountId) {
-    hireBtn.textContent = "Booking unavailable";
     hireBtn.classList.add("disabled");
     hireBtn.disabled = true;
-    notice.textContent =
-      "This performer has not finished payout setup yet.";
+    notice.textContent = "Stripe not connected.";
   } else {
-    hireBtn.textContent = "Hire Performer";
     hireBtn.classList.remove("disabled");
     hireBtn.disabled = false;
     notice.textContent = "";
     hireBtn.onclick = () => {
-      window.location.href = "payment.html";
-
+      alert("Stripe will be wired next.");
     };
   }
 
