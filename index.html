@@ -159,4 +159,90 @@ function renderCards(list) {
       ${p.profilePic ? `<img src="${p.profilePic}">` : ""}
       <h2>${p.name}</h2>
       ${p.socials ? `<div class="socials">${p.socials}</div>` : ""}
-      ${(p.city || p.state) ? `<p>${p.city}${p.city && p.state ? ",
+      ${(p.city || p.state) ? `<p>${p.city}${p.city && p.state ? ", " : ""}${p.state}</p>` : ""}
+      ${p.genre ? `<p><strong>${p.genre}</strong></p>` : ""}
+    `;
+
+    card.onclick = () => openModal(p);
+    container.appendChild(card);
+  });
+}
+
+fetch("/api/performers")
+  .then(res => res.ok ? res.json() : Promise.reject())
+  .then(pages => {
+    if (!Array.isArray(pages) || pages.length === 0) throw new Error();
+
+    const performers = pages.map(page => {
+      const props = page.properties || {};
+      return {
+        name: Object.values(props).find(p => p.type === "title")?.title?.[0]?.plain_text || "Unnamed Performer",
+        socials: props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "",
+        city: props.City?.rich_text?.[0]?.plain_text || "",
+        state: props.State?.rich_text?.[0]?.plain_text || "",
+        genre: props.Genre?.rich_text?.[0]?.plain_text || "",
+        bio: props["Short Bio"]?.rich_text?.[0]?.plain_text || "",
+        stripeAccountId: props["Stripe Account ID"]?.rich_text?.[0]?.plain_text || "",
+        profilePic:
+          props["Profile Picture"]?.files?.[0]?.file?.url ||
+          props["Profile Picture"]?.files?.[0]?.external?.url ||
+          ""
+      };
+    });
+
+    renderCards(performers);
+  })
+  .catch(() => {
+    // 🔒 Guaranteed fallback — page NEVER blank
+    renderCards([{
+      name: "Sample Performer",
+      city: "Phoenix",
+      state: "AZ",
+      genre: "Live Music",
+      bio: "Temporary fallback card so your site never breaks.",
+      socials: "",
+      stripeAccountId: "",
+      profilePic: ""
+    }]);
+  });
+
+function openModal(data) {
+  const modal = document.getElementById("modal");
+  const body = document.getElementById("modalBody");
+  const hireBtn = document.getElementById("hireBtn");
+  const notice = document.getElementById("notice");
+
+  body.innerHTML = `
+    ${data.profilePic ? `<img src="${data.profilePic}">` : ""}
+    <h2>${data.name}</h2>
+    ${data.bio ? `<p>${data.bio}</p>` : ""}
+  `;
+
+  if (!data.stripeAccountId) {
+    hireBtn.textContent = "Booking unavailable";
+    hireBtn.classList.add("disabled");
+    hireBtn.disabled = true;
+    notice.textContent = "This performer has not completed payouts.";
+  } else {
+    hireBtn.textContent = "Hire Performer";
+    hireBtn.classList.remove("disabled");
+    hireBtn.disabled = false;
+    notice.textContent = "";
+    hireBtn.onclick = () => {
+      window.location.href = "payment.html?performer=" + encodeURIComponent(data.name);
+    };
+  }
+
+  modal.style.display = "flex";
+}
+
+document.getElementById("closeModal").onclick = () =>
+  document.getElementById("modal").style.display = "none";
+
+document.getElementById("modal").onclick = e => {
+  if (e.target.id === "modal") e.target.style.display = "none";
+};
+</script>
+
+</body>
+</html>
