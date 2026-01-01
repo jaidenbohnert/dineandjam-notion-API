@@ -1,13 +1,12 @@
 import { Client } from "@notionhq/client";
 
-const notion = new Client({ auth: process.env.NOTION_SECRET });
+const notion = new Client({ auth: process.env.NOTION_SECRET }); // make sure this matches Vercel
 
 export default async function handler(req, res) {
   try {
-    const databaseId = process.env.NOTION_DATABASE_ID;
+    const databaseId = process.env.NOTION_DATABASE_ID; // make sure this exists in Vercel
     const response = await notion.databases.query({ database_id: databaseId });
 
-    // Map Notion pages to safe objects for frontend
     const performers = response.results.map(page => {
       const props = page.properties || {};
 
@@ -29,7 +28,6 @@ export default async function handler(req, res) {
     res.status(200).json(performers);
   } catch (err) {
     console.error("Notion API error:", err.message);
-    // Always return JSON — frontend fallback will work
     res.status(200).json([
       {
         name: "Sample Performer",
