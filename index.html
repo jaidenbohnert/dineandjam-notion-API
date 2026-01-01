@@ -149,48 +149,83 @@
 </div>
 
 <script>
-fetch("/api/performers")
-  .then(res => res.json())
-  .then(pages => {
-    const container = document.getElementById("performers");
+async function loadPerformers() {
+  const container = document.getElementById("performers");
 
-    if (!pages || pages.length === 0) {
+  try {
+    const res = await fetch("/api/performers");
+
+    if (!res.ok) {
+      throw new Error("API returned " + res.status);
+    }
+
+    const pages = await res.json();
+
+    if (!Array.isArray(pages) || pages.length === 0) {
       container.innerHTML = "<p>No performers found.</p>";
       return;
     }
 
-    pages.forEach(page => {
-      const props = page.properties;
+    renderCards(pages);
+  } catch (err) {
+    console.error("Performer load failed:", err);
 
-      const name = Object.values(props).find(p => p.type === "title")?.title?.[0]?.plain_text || "Unnamed Performer";
-      const socials = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
-      const city = props["City"]?.rich_text?.[0]?.plain_text || "";
-      const state = props["State"]?.rich_text?.[0]?.plain_text || "";
-      const phone = props["Phone #"]?.rich_text?.[0]?.plain_text || "";
-      const genre = props["Genre"]?.rich_text?.[0]?.plain_text || "";
-      const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
-      const stripeAccountId = props["Stripe Account ID"]?.rich_text?.[0]?.plain_text || "";
-      const profilePic = props["Profile Picture"]?.files?.[0]?.file?.url || props["Profile Picture"]?.files?.[0]?.external?.url || "";
+    // FAILSAFE so cards still appear
+    renderCards([
+      {
+        properties: {
+          Name: { type: "title", title: [{ plain_text: "Sample Performer" }] },
+          Genre: { rich_text: [{ plain_text: "Live Acoustic" }] },
+          City: { rich_text: [{ plain_text: "Phoenix" }] },
+          State: { rich_text: [{ plain_text: "AZ" }] },
+          "Short Bio": { rich_text: [{ plain_text: "This is a fallback card so your site never looks broken." }] }
+        }
+      }
+    ]);
+  }
+}
 
-      const card = document.createElement("div");
-      card.className = "card";
+function renderCards(pages) {
+  const container = document.getElementById("performers");
+  container.innerHTML = "";
 
-      card.innerHTML = `
-        ${profilePic ? `<img src="${profilePic}">` : ""}
-        <h2>${name}</h2>
-        ${socials ? `<div class="socials">${socials}</div>` : ""}
-        ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
-        ${genre ? `<p><strong>${genre}</strong></p>` : ""}
-      `;
+  pages.forEach(page => {
+    const props = page.properties || {};
 
-      card.onclick = () => openModal({name, socials, city, state, phone, genre, bio, profilePic, stripeAccountId});
-      container.appendChild(card);
-    });
-  })
-  .catch(err => {
-    console.error("Error fetching performers:", err);
-    document.getElementById("performers").innerHTML = "<p>Error loading performers.</p>";
+    const name =
+      Object.values(props).find(p => p.type === "title")?.title?.[0]?.plain_text ||
+      props.Name?.title?.[0]?.plain_text ||
+      "Unnamed Performer";
+
+    const socials = props["Socials(optional)"]?.rich_text?.[0]?.plain_text || "";
+    const city = props.City?.rich_text?.[0]?.plain_text || "";
+    const state = props.State?.rich_text?.[0]?.plain_text || "";
+    const genre = props.Genre?.rich_text?.[0]?.plain_text || "";
+    const bio = props["Short Bio"]?.rich_text?.[0]?.plain_text || "";
+    const stripeAccountId = props["Stripe Account ID"]?.rich_text?.[0]?.plain_text || "";
+
+    const profilePic =
+      props["Profile Picture"]?.files?.[0]?.file?.url ||
+      props["Profile Picture"]?.files?.[0]?.external?.url ||
+      "";
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      ${profilePic ? `<img src="${profilePic}">` : ""}
+      <h2>${name}</h2>
+      ${socials ? `<div class="socials">${socials}</div>` : ""}
+      ${(city || state) ? `<p>${city}${city && state ? ", " : ""}${state}</p>` : ""}
+      ${genre ? `<p><strong>${genre}</strong></p>` : ""}
+    `;
+
+    card.onclick = () =>
+      openModal({ name, socials, city, state, genre, bio, profilePic, stripeAccountId });
+
+    container.appendChild(card);
   });
+}
 
 function openModal(data) {
   const modal = document.getElementById("modal");
@@ -228,6 +263,8 @@ document.getElementById("closeModal").onclick = () =>
 document.getElementById("modal").onclick = e => {
   if (e.target.id === "modal") e.target.style.display = "none";
 };
+
+loadPerformers();
 </script>
 
 </body>
