@@ -168,7 +168,7 @@ function renderCards(list) {
   });
 }
 
-fetch("/api/performers")
+fetch("https://dineandjam-notion-api.vercel.app/api/performers")
   .then(res => res.ok ? res.json() : Promise.reject())
   .then(pages => {
     if (!Array.isArray(pages) || pages.length === 0) throw new Error();
