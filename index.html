@@ -60,7 +60,7 @@
       color: #444;
     }
 
-    .hire-btn {
+    .more-btn {
       margin-top: 14px;
       width: 100%;
       padding: 10px;
@@ -72,9 +72,52 @@
       cursor: pointer;
     }
 
-    .hire-btn:hover {
+    .more-btn:hover {
       background: #ff8500;
     }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      padding: 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .modal-content p {
+      font-size: 14px;
+      margin: 6px 0;
+    }
+
   </style>
 </head>
 
@@ -83,6 +126,14 @@
   <h1>🎶 Dine & Jam Performers</h1>
 
   <div class="container" id="performers"></div>
+
+  <!-- Modal Structure -->
+  <div id="modal" class="modal">
+    <div class="modal-content" id="modalContent">
+      <span class="close-btn" id="modalClose">&times;</span>
+      <div id="modalBody"></div>
+    </div>
+  </div>
 
   <script>
     const API_URL = "https://dineandjam-notion-api.vercel.app/api/performers";
@@ -102,28 +153,15 @@
           card.innerHTML = `
             <img src="${p.profilePicture}" alt="${p.name}">
             <h3>${p.name}</h3>
-
             <p><strong>Genre:</strong> ${p.genre}</p>
             <p><strong>City:</strong> ${p.city || "N/A"}</p>
             <p><strong>Availability:</strong> ${p.availability || "N/A"}</p>
-
             ${p.bio ? `<p class="bio">${p.bio}</p>` : ""}
-
-            ${p.email ? `<p><strong>Email:</strong> ${p.email}</p>` : ""}
-            ${p.phone ? `<p><strong>Phone:</strong> ${p.phone}</p>` : ""}
-
-            ${
-              p.socials && p.socials.length
-                ? `<p><strong>Socials:</strong><br>${p.socials.join("<br>")}</p>`
-                : ""
-            }
-
-            ${
-              p.stripeAccountId
-                ? `<button class="hire-btn">Hire Performer</button>`
-                : ""
-            }
+            <button class="more-btn">More About Performer</button>
           `;
+
+          // Add event listener for modal
+          card.querySelector(".more-btn").addEventListener("click", () => openModal(p));
 
           container.appendChild(card);
         });
@@ -132,6 +170,41 @@
         console.error("Failed to load performers:", err);
       }
     }
+
+    // Modal elements
+    const modal = document.getElementById("modal");
+    const modalBody = document.getElementById("modalBody");
+    const modalClose = document.getElementById("modalClose");
+
+    function openModal(performer) {
+      modalBody.innerHTML = `
+        <h2>${performer.name}</h2>
+        <img src="${performer.profilePicture}" alt="${performer.name}" style="width:100%; height:250px; object-fit:cover; border-radius:12px; margin-bottom:15px;">
+        <p><strong>Genre:</strong> ${performer.genre}</p>
+        <p><strong>City:</strong> ${performer.city || "N/A"}</p>
+        <p><strong>Availability:</strong> ${performer.availability || "N/A"}</p>
+        <p><strong>Bio:</strong> ${performer.bio || "N/A"}</p>
+        ${performer.email ? `<p><strong>Email:</strong> ${performer.email}</p>` : ""}
+        ${performer.phone ? `<p><strong>Phone:</strong> ${performer.phone}</p>` : ""}
+        ${
+          performer.socials && performer.socials.length
+            ? `<p><strong>Socials:</strong><br>${performer.socials.join("<br>")}</p>`
+            : ""
+        }
+        ${
+          performer.stripeAccountId
+            ? `<p><strong>Stripe ID:</strong> ${performer.stripeAccountId}</p>`
+            : ""
+        }
+      `;
+      modal.style.display = "block";
+    }
+
+    // Close modal
+    modalClose.addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
 
     loadPerformers();
   </script>
