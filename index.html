@@ -1,213 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dine & Jam – Performers</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dine & Jam — Hire a Performer</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #FFE5B4; /* light orange */
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #FFD59A; /* light orange */
+    color: #333;
+  }
 
-    h1 {
-      text-align: center;
-      padding: 24px 0 10px;
-    }
+  h1 {
+    text-align: center;
+    padding: 50px 20px 10px;
+    font-size: 3em;
+  }
 
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 24px;
-      padding: 20px 40px 60px;
-    }
+  .subtitle {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 40px;
+    color: #444;
+  }
 
-    .performer-card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      width: 300px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+  .container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    padding: 20px 40px 80px;
+    max-width: 1300px;
+    margin: auto;
+  }
 
-    .performer-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 16px 35px rgba(0,0,0,0.18);
-    }
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .performer-card img {
-      width: 100%;
-      height: 190px;
-      object-fit: cover;
-      border-radius: 12px;
-    }
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.28);
+  }
 
-    .performer-card h3 {
-      margin: 12px 0 6px;
-    }
+  .card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 14px;
+  }
 
-    .performer-card p {
-      margin: 6px 0;
-      font-size: 14px;
-      line-height: 1.4;
-    }
+  .card h3 {
+    margin: 16px 0 6px;
+    font-size: 1.6em;
+  }
 
-    .bio {
-      font-style: italic;
-      color: #444;
-    }
+  .card p {
+    margin: 6px 0;
+    font-size: 14px;
+  }
 
-    .more-btn {
-      margin-top: 14px;
-      width: 100%;
-      padding: 10px;
-      background: #ff9f1c;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      cursor: pointer;
-    }
+  .bio {
+    font-style: italic;
+    color: #555;
+  }
 
-    .more-btn:hover {
-      background: #ff8500;
-    }
+  .btn {
+    margin-top: auto;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: #ff9f1c;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
 
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      background-color: rgba(0,0,0,0.6);
-    }
+  .btn:hover {
+    background: #ff8500;
+  }
 
-    .modal-content {
-      background: white;
-      margin: 50px auto;
-      padding: 30px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 600px;
-      position: relative;
-    }
+  /* MODAL */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 999;
+    overflow-y: auto;
+  }
 
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-      cursor: pointer;
-    }
+  .modal-content {
+    background: white;
+    max-width: 720px;
+    margin: 60px auto;
+    padding: 30px;
+    border-radius: 22px;
+    position: relative;
+    animation: fadeIn 0.25s ease;
+  }
 
-    .modal-content h2 {
-      margin-top: 0;
-    }
+  .close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 30px;
+    cursor: pointer;
+  }
 
-    .modal-content p {
-      font-size: 14px;
-      margin: 6px 0;
-    }
+  .modal-content img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 18px;
+  }
 
-  </style>
+  .modal-content h2 {
+    margin-top: 0;
+    color: #ff6f61;
+  }
+
+  .modal-content p {
+    font-size: 15px;
+    margin: 8px 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
 </head>
 
 <body>
 
-  <h1>🎶 Dine & Jam Performers</h1>
+<h1>🎶 Hire a Performer</h1>
+<p class="subtitle">Browse real performers. Click to see full profiles.</p>
 
-  <div class="container" id="performers"></div>
+<div class="container" id="cards"></div>
 
-  <!-- Modal Structure -->
-  <div id="modal" class="modal">
-    <div class="modal-content" id="modalContent">
-      <span class="close-btn" id="modalClose">&times;</span>
-      <div id="modalBody"></div>
-    </div>
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <div id="modalBody"></div>
   </div>
+</div>
 
-  <script>
-    const API_URL = "https://dineandjam-notion-api.vercel.app/api/performers";
+<script>
+const API_URL = "https://dineandjam-notion-api.vercel.app/api/performers";
 
-    async function loadPerformers() {
-      try {
-        const res = await fetch(API_URL);
-        const performers = await res.json();
+const cards = document.getElementById("cards");
+const modal = document.getElementById("modal");
+const modalBody = document.getElementById("modalBody");
+const closeModal = document.getElementById("closeModal");
 
-        const container = document.getElementById("performers");
-        container.innerHTML = "";
+fetch(API_URL)
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
 
-        performers.forEach(p => {
-          const card = document.createElement("div");
-          card.className = "performer-card";
-
-          card.innerHTML = `
-            <img src="${p.profilePicture}" alt="${p.name}">
-            <h3>${p.name}</h3>
-            <p><strong>Genre:</strong> ${p.genre}</p>
-            <p><strong>City:</strong> ${p.city || "N/A"}</p>
-            <p><strong>Availability:</strong> ${p.availability || "N/A"}</p>
-            ${p.bio ? `<p class="bio">${p.bio}</p>` : ""}
-            <button class="more-btn">More About Performer</button>
-          `;
-
-          // Add event listener for modal
-          card.querySelector(".more-btn").addEventListener("click", () => openModal(p));
-
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        console.error("Failed to load performers:", err);
-      }
-    }
-
-    // Modal elements
-    const modal = document.getElementById("modal");
-    const modalBody = document.getElementById("modalBody");
-    const modalClose = document.getElementById("modalClose");
-
-    function openModal(performer) {
-      modalBody.innerHTML = `
-        <h2>${performer.name}</h2>
-        <img src="${performer.profilePicture}" alt="${performer.name}" style="width:100%; height:250px; object-fit:cover; border-radius:12px; margin-bottom:15px;">
-        <p><strong>Genre:</strong> ${performer.genre}</p>
-        <p><strong>City:</strong> ${performer.city || "N/A"}</p>
-        <p><strong>Availability:</strong> ${performer.availability || "N/A"}</p>
-        <p><strong>Bio:</strong> ${performer.bio || "N/A"}</p>
-        ${performer.email ? `<p><strong>Email:</strong> ${performer.email}</p>` : ""}
-        ${performer.phone ? `<p><strong>Phone:</strong> ${performer.phone}</p>` : ""}
-        ${
-          performer.socials && performer.socials.length
-            ? `<p><strong>Socials:</strong><br>${performer.socials.join("<br>")}</p>`
-            : ""
-        }
-        ${
-          performer.stripeAccountId
-            ? `<p><strong>Stripe ID:</strong> ${performer.stripeAccountId}</p>`
-            : ""
-        }
+      card.innerHTML = `
+        <img src="${p.profilePicture}">
+        <h3>${p.name}</h3>
+        <p><strong>Genre:</strong> ${p.genre}</p>
+        <p><strong>City:</strong> ${p.city || "N/A"}</p>
+        <p class="bio">${p.bio || ""}</p>
+        <button class="btn">More About Performer</button>
       `;
-      modal.style.display = "block";
-    }
 
-    // Close modal
-    modalClose.addEventListener("click", () => modal.style.display = "none");
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) modal.style.display = "none";
+      card.querySelector(".btn").onclick = () => openModal(p);
+      cards.appendChild(card);
     });
+  });
 
-    loadPerformers();
-  </script>
+function openModal(p) {
+  modalBody.innerHTML = `
+    <h2>${p.name}</h2>
+    <img src="${p.profilePicture}">
+    <p><strong>Genre:</strong> ${p.genre}</p>
+    <p><strong>City:</strong> ${p.city || "N/A"}</p>
+    <p><strong>Availability:</strong> ${p.availability || "N/A"}</p>
+    <p><strong>Bio:</strong> ${p.bio || "N/A"}</p>
+    ${p.email ? `<p><strong>Email:</strong> ${p.email}</p>` : ""}
+    ${p.phone ? `<p><strong>Phone:</strong> ${p.phone}</p>` : ""}
+    ${p.socialLinks?.length ? `<p><strong>Socials:</strong><br>${p.socialLinks.join("<br>")}</p>` : ""}
+  `;
+  modal.style.display = "block";
+}
+
+closeModal.onclick = () => modal.style.display = "none";
+window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+</script>
 
 </body>
 </html>
