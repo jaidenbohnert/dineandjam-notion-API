@@ -1,207 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Dine & Jam — Hire a Performer</title>
+  <meta charset="UTF-8" />
+  <title>Dine & Jam – Performers</title>
 
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #FFD59A; /* light orange */
-    color: #333;
-  }
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #ffe6c7;
+    }
 
-  h1 {
-    text-align: center;
-    padding: 50px 20px 10px;
-    font-size: 3em;
-  }
+    h1 {
+      text-align: center;
+      padding: 30px 10px 10px;
+    }
 
-  .subtitle {
-    text-align: center;
-    font-size: 1.2em;
-    margin-bottom: 40px;
-    color: #444;
-  }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      padding: 30px;
+      max-width: 1200px;
+      margin: auto;
+    }
 
-  .container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
-    padding: 20px 40px 80px;
-    max-width: 1300px;
-    margin: auto;
-  }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-  .card {
-    background: white;
-    border-radius: 20px;
-    padding: 22px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    display: flex;
-    flex-direction: column;
-  }
+    .card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
 
-  .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.28);
-  }
+    .card h2 {
+      margin: 0 0 5px;
+    }
 
-  .card img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 14px;
-  }
+    .genre {
+      font-weight: bold;
+      color: #ff7a00;
+      margin-bottom: 10px;
+    }
 
-  .card h3 {
-    margin: 16px 0 6px;
-    font-size: 1.6em;
-  }
+    .card button {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #ff7a00;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-  .card p {
-    margin: 6px 0;
-    font-size: 14px;
-  }
+    /* MODAL */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
 
-  .bio {
-    font-style: italic;
-    color: #555;
-  }
+    .modal-content {
+      background: white;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 16px;
+      padding: 25px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
 
-  .btn {
-    margin-top: auto;
-    padding: 14px;
-    border-radius: 14px;
-    border: none;
-    background: #ff9f1c;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 22px;
+      cursor: pointer;
+    }
 
-  .btn:hover {
-    background: #ff8500;
-  }
+    .modal-content h2 {
+      margin-top: 0;
+    }
 
-  /* MODAL */
-  .modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 999;
-    overflow-y: auto;
-  }
+    .field {
+      margin-bottom: 12px;
+    }
 
-  .modal-content {
-    background: white;
-    max-width: 720px;
-    margin: 60px auto;
-    padding: 30px;
-    border-radius: 22px;
-    position: relative;
-    animation: fadeIn 0.25s ease;
-  }
+    .label {
+      font-weight: bold;
+    }
 
-  .close {
-    position: absolute;
-    right: 20px;
-    top: 15px;
-    font-size: 30px;
-    cursor: pointer;
-  }
-
-  .modal-content img {
-    width: 100%;
-    height: 260px;
-    object-fit: cover;
-    border-radius: 14px;
-    margin-bottom: 18px;
-  }
-
-  .modal-content h2 {
-    margin-top: 0;
-    color: #ff6f61;
-  }
-
-  .modal-content p {
-    font-size: 15px;
-    margin: 8px 0;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-15px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
+    .book-btn {
+      margin-top: 25px;
+      padding: 14px;
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      background: #28a745;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>🎶 Hire a Performer</h1>
-<p class="subtitle">Browse real performers. Click to see full profiles.</p>
+<h1>Available Performers</h1>
 
-<div class="container" id="cards"></div>
+<div class="grid" id="cards"></div>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-content">
-    <span class="close" id="closeModal">&times;</span>
+    <span class="close" onclick="closeModal()">✕</span>
     <div id="modalBody"></div>
+
+    <!-- NEW BUTTON -->
+    <button class="book-btn">
+      Book Performer
+    </button>
   </div>
 </div>
 
 <script>
-const API_URL = "https://dineandjam-notion-api.vercel.app/api/performers";
+async function loadPerformers() {
+  const res = await fetch("https://dineandjam.vercel.app/api/performers");
+  const data = await res.json();
 
-const cards = document.getElementById("cards");
-const modal = document.getElementById("modal");
-const modalBody = document.getElementById("modalBody");
-const closeModal = document.getElementById("closeModal");
+  const container = document.getElementById("cards");
 
-fetch(API_URL)
-  .then(res => res.json())
-  .then(data => {
-    data.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "card";
+  data.results.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-      card.innerHTML = `
-        <img src="${p.profilePicture}">
-        <h3>${p.name}</h3>
-        <p><strong>Genre:</strong> ${p.genre}</p>
-        <p><strong>City:</strong> ${p.city || "N/A"}</p>
-        <p class="bio">${p.bio || ""}</p>
-        <button class="btn">More About Performer</button>
-      `;
+    card.innerHTML = `
+      <img src="${p.profilePicture || 'https://via.placeholder.com/400'}">
+      <h2>${p.name}</h2>
+      <div class="genre">${p.genre || ''}</div>
+      <button onclick='openModal(${JSON.stringify(p)})'>
+        More About Performer
+      </button>
+    `;
 
-      card.querySelector(".btn").onclick = () => openModal(p);
-      cards.appendChild(card);
-    });
+    container.appendChild(card);
   });
-
-function openModal(p) {
-  modalBody.innerHTML = `
-    <h2>${p.name}</h2>
-    <img src="${p.profilePicture}">
-    <p><strong>Genre:</strong> ${p.genre}</p>
-    <p><strong>City:</strong> ${p.city || "N/A"}</p>
-    <p><strong>Availability:</strong> ${p.availability || "N/A"}</p>
-    <p><strong>Bio:</strong> ${p.bio || "N/A"}</p>
-    ${p.email ? `<p><strong>Email:</strong> ${p.email}</p>` : ""}
-    ${p.phone ? `<p><strong>Phone:</strong> ${p.phone}</p>` : ""}
-    ${p.socialLinks?.length ? `<p><strong>Socials:</strong><br>${p.socialLinks.join("<br>")}</p>` : ""}
-  `;
-  modal.style.display = "block";
 }
 
-closeModal.onclick = () => modal.style.display = "none";
-window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+function openModal(p) {
+  document.getElementById("modal").style.display = "flex";
+
+  document.getElementById("modalBody").innerHTML = `
+    <h2>${p.name}</h2>
+
+    <div class="field"><span class="label">Genre:</span> ${p.genre || ''}</div>
+    <div class="field"><span class="label">City:</span> ${p.city || ''}</div>
+    <div class="field"><span class="label">Availability:</span> ${p.availability || ''}</div>
+    <div class="field"><span class="label">Bio:</span> ${p.shortBio || ''}</div>
+    <div class="field"><span class="label">Email:</span> ${p.email || ''}</div>
+    <div class="field"><span class="label">Phone:</span> ${p.phone || ''}</div>
+    <div class="field"><span class="label">Socials:</span> ${p.socials || ''}</div>
+  `;
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
+
+loadPerformers();
 </script>
 
 </body>
