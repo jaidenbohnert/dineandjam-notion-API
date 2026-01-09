@@ -1,22 +1,26 @@
 import { Client } from "@notionhq/client";
 
-// Hard fail early if env vars are missing (prevents silent crashes)
-if (!process.env.NOTION_API_KEY || !process.env.NOTION_DATABASE_ID) {
-  throw new Error("Missing NOTION_API_KEY or NOTION_DATABASE_ID");
-}
-
 const notion = new Client({
   auth: process.env.NOTION_API_KEY,
 });
 
 export default async function handler(req, res) {
-  // CORS (important for GitHub Pages)
+  // CORS for GitHub Pages
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
+  }
+
+  // ✅ ENV CHECK INSIDE HANDLER (serverless-safe)
+  if (!process.env.NOTION_API_KEY || !process.env.NOTION_DATABASE_ID) {
+    console.error("Missing Notion environment variables");
+    return res.status(500).json({
+      success: false,
+      error: "Server misconfiguration",
+    });
   }
 
   try {
@@ -48,7 +52,6 @@ export default async function handler(req, res) {
       };
     });
 
-    // 🔑 CRITICAL: match frontend expectation
     return res.status(200).json({
       success: true,
       results: performers,
