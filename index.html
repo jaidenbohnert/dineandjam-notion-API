@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Dine & Jam – Performers</title>
-
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #ffd9b3; /* light orange background */
+      font-family: 'Arial', sans-serif;
+      background: #ffd9b3; /* light orange */
     }
 
     h1 {
       text-align: center;
       padding: 30px 10px 10px;
+      font-size: 2.5rem;
+      color: #ff7a00;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
 
     .grid {
@@ -26,18 +28,19 @@
     }
 
     .card {
-      background: white;
+      background: #fff;
       border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.2s;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
     }
 
     .card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.2);
     }
 
     .card img {
@@ -50,16 +53,31 @@
 
     .card h2 {
       margin: 0 0 5px;
+      font-size: 1.6rem;
+      color: #333;
+    }
+
+    .city {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 5px;
     }
 
     .genre {
       font-weight: bold;
       color: #ff7a00;
       margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .bio-snippet {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 10px;
     }
 
     .card button {
-      margin-top: 15px;
+      margin-top: auto;
       padding: 12px;
       border-radius: 10px;
       border: none;
@@ -67,6 +85,11 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .card button:hover {
+      background: #e66800;
     }
 
     /* MODAL */
@@ -101,6 +124,7 @@
 
     .modal-content h2 {
       margin-top: 0;
+      color: #ff7a00;
     }
 
     .field {
@@ -121,10 +145,14 @@
       color: white;
       font-size: 18px;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .book-btn:hover {
+      background: #218838;
     }
   </style>
 </head>
-
 <body>
 
 <h1>Available Performers</h1>
@@ -136,52 +164,54 @@
   <div class="modal-content">
     <span class="close" onclick="closeModal()">✕</span>
     <div id="modalBody"></div>
-    <button class="book-btn" onclick="bookPerformer()">Book Performer</button>
+
+    <button class="book-btn" onclick="bookPerformer()">
+      Book Performer
+    </button>
   </div>
 </div>
 
 <script>
 let currentPerformer = null;
 
-// Load performers from your Vercel API
-async function loadPerformers() {
-  try {
-    const res = await fetch("https://dineandjam-notion-api.vercel.app/api/performers");
-    const data = await res.json();
-
-    if (!data.success || !Array.isArray(data.results)) return;
-
-    const container = document.getElementById("cards");
-    container.innerHTML = "";
-
-    data.results.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      card.innerHTML = `
-        <img src="${p.profilePicture || 'https://via.placeholder.com/400'}" alt="${p.name}">
-        <h2>${p.name}</h2>
-        <div class="genre">${p.genre || ''}</div>
-        <button onclick='openModal(${JSON.stringify(p)})'>
-          More About Performer
-        </button>
-      `;
-
-      container.appendChild(card);
-    });
-
-  } catch (err) {
-    console.error("Failed to load performers:", err);
-  }
+// Helper to truncate bio snippet
+function truncateText(text, maxLength = 100) {
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
-// Open modal with all performer details
+async function loadPerformers() {
+  const res = await fetch("https://dineandjam-notion-api.vercel.app/api/performers");
+  const data = await res.json();
+
+  const performers = Array.isArray(data.results) ? data.results : [];
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
+
+  performers.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${p.profilePicture || 'https://via.placeholder.com/400'}" alt="${p.name}">
+      <h2>${p.name}</h2>
+      <div class="city">${p.city || ''}</div>
+      <div class="genre">${p.genre || ''}</div>
+      <div class="bio-snippet">${truncateText(p.shortBio, 120)}</div>
+      <button onclick='openModal(${JSON.stringify(p)})'>More About Performer</button>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
 function openModal(p) {
   currentPerformer = p;
   document.getElementById("modal").style.display = "flex";
 
   document.getElementById("modalBody").innerHTML = `
     <h2>${p.name}</h2>
+
     <div class="field"><span class="label">Genre:</span> ${p.genre || ''}</div>
     <div class="field"><span class="label">City:</span> ${p.city || ''}</div>
     <div class="field"><span class="label">Availability:</span> ${p.availability || ''}</div>
@@ -189,23 +219,19 @@ function openModal(p) {
     <div class="field"><span class="label">Email:</span> ${p.email || ''}</div>
     <div class="field"><span class="label">Phone:</span> ${p.phone || ''}</div>
     <div class="field"><span class="label">Socials:</span> ${Array.isArray(p.socials) ? p.socials.join(', ') : ''}</div>
-    <div class="field"><span class="label">Price:</span> ${p.price || ''}</div>
   `;
 }
 
-// Close modal
 function closeModal() {
   document.getElementById("modal").style.display = "none";
   currentPerformer = null;
 }
 
-// Placeholder Book Performer action (for Stripe later)
 function bookPerformer() {
   if (!currentPerformer) return;
-  alert(`Booking performer: ${currentPerformer.name}\nPrice: ${currentPerformer.price || "TBD"}`);
+  alert(`Booking performer: ${currentPerformer.name}\nPrice info coming soon!`);
 }
 
-// Initialize
 loadPerformers();
 </script>
 
