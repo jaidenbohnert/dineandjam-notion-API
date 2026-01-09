@@ -1,12 +1,24 @@
 import { Client } from "@notionhq/client";
 
+// Hard fail early if env vars are missing (prevents silent crashes)
 if (!process.env.NOTION_API_KEY || !process.env.NOTION_DATABASE_ID) {
-  throw new Error("Missing Notion environment variables");
+  throw new Error("Missing NOTION_API_KEY or NOTION_DATABASE_ID");
 }
 
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
+const notion = new Client({
+  auth: process.env.NOTION_API_KEY,
+});
 
 export default async function handler(req, res) {
+  // CORS (important for GitHub Pages)
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   try {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID,
@@ -18,27 +30,37 @@ export default async function handler(req, res) {
 
       return {
         id: page.id,
-        name: p.Name?.title?.[0]?.text?.content ?? "No Name",
-        genre: p.Genre?.rich_text?.[0]?.text?.content ?? "",
-        bio: p["Short Bio"]?.rich_text?.[0]?.text?.content ?? "",
+        name: p.Name?.title?.[0]?.text?.content || "No Name",
+        genre: p.Genre?.rich_text?.[0]?.text?.content || "",
+        shortBio: p["Short Bio"]?.rich_text?.[0]?.text?.content || "",
         profilePicture:
           p["Profile Picture"]?.files?.[0]?.file?.url ||
           p["Profile Picture"]?.files?.[0]?.external?.url ||
-          "https://via.placeholder.com/200",
-        socials: p["Socials(Optional)"]?.rich_text?.map(t => t.text.content) ?? [],
-        email: p.Email?.email ?? "",
-        phone: p["Phone #"]?.phone_number ?? "",
-        city: p.City?.rich_text?.[0]?.text?.content ?? "",
-        availability: p.Availability?.rich_text?.[0]?.text?.content ?? "",
-        stripeAccountId: p["Stripe Account ID"]?.rich_text?.[0]?.text?.content ?? "",
+          "https://via.placeholder.com/400",
+        socials:
+          p["Socials(Optional)"]?.rich_text?.map(t => t.text.content) || [],
+        email: p.Email?.email || "",
+        phone: p["Phone #"]?.phone_number || "",
+        city: p.City?.rich_text?.[0]?.text?.content || "",
+        availability: p.Availability?.rich_text?.[0]?.text?.content || "",
+        stripeAccountId:
+          p["Stripe Account ID"]?.rich_text?.[0]?.text?.content || "",
       };
     });
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.status(200).json(performers);
+    // 🔑 CRITICAL: match frontend expectation
+    return res.status(200).json({
+      success: true,
+      results: performers,
+    });
 
-  } catch (err) {
-    console.error("API failure:", err);
-    res.status(500).json({ error: "Internal API failure", message: err.message });
+  } catch (error) {
+    console.error("Performer API error:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Internal API failure",
+      message: error.message,
+    });
   }
 }
