@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Performer</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .performer-info { margin-bottom: 20px; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100px; padding: 5px; }
+    #total { font-weight: bold; margin-top: 10px; }
+    button { background-color: green; color: white; padding: 10px 15px; border: none; margin-top: 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Book Performer</h1>
+
+  <div class="performer-info">
+    <p><strong>Name:</strong> <span id="performer-name"></span></p>
+    <p><strong>Price/hr:</strong> $<span id="performer-price"></span></p>
+    <p><strong>Phone:</strong> <span id="performer-phone"></span></p>
+  </div>
+
+  <div class="booking-form">
+    <label>Number of hours desired (decimal if partial):</label>
+    <input type="number" id="hours" step="0.01" min="0">
+
+    <p>7% DineAndJam fee: $<span id="fee">0.00</span></p>
+    <p>Total: $<span id="total">0.00</span></p>
+
+    <button id="submit-request">Submit Request to Performer</button>
+  </div>
+
+  <script src="book-performer.js"></script>
+</body>
+</html>
